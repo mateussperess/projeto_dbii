@@ -1,7 +1,5 @@
 # BIBLIOTECA
 
-Este é um exemplo de uso do padrão Controller-Service-Repository para a construção de uma API Rest usando PHP puro. Para fins didáticos, alguns pontos foram simplificados ou abstraídos. Da mesma forma, algumas soluções foram adotadas a fim de permitir a problematização de aspectos importantes do projeto durante as aulas, além da discussão das mudanças necessárias para a sua evolução ou para a implementação de outras técnicas/princípios.
-
 ## Entidades e Relações
 
 * Usuário (nome, email, senha, telefone, isAdmin)
