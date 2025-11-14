@@ -12,6 +12,12 @@ try {
 }
 
 try {
+  $conn->exec("DROP TABLE users");
+  $conn->exec("DROP TABLE token");
+  $conn->exec("DROP TABLE livros");
+  $conn->exec("DROP TABLE categorias");
+  $conn->exec("DROP TABLE emprestimos");
+  echo "Tabelas limpas com sucesso!\n";
 
   // tabela Users
   $table_users = "CREATE TABLE IF NOT EXISTS users (
@@ -441,12 +447,26 @@ try {
     $stmt->execute($categoria);
   }
 
+  $sql = "INSERT INTO livros(titulo, autor, descricao, ano, n_paginas, id_genero) VALUES (?, ?, ?, ?, ?, ?);";
+  $stmt = $conn->prepare($sql);
+  foreach ($livros as $livro) {
+    $stmt->execute([
+      $livro['titulo'],
+      $livro['autor'],
+      $livro['descricao'],
+      $livro['ano'],
+      $livro['n_paginas'],
+      $livro['id_genero']
+    ]);
+  }
+
   $conn->commit();
+  echo "Banco de dados configurado com sucesso!" . PHP_EOL;
 } catch (PDOException $e) {
-  if($conn->inTransaction()) {
+  if ($conn->inTransaction()) {
     $conn->rollBack();
   }
- 
+
   echo "Erro ao inserir os dados: " . $e->getMessage() . PHP_EOL;
   exit;
 }
