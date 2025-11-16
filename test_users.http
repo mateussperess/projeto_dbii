@@ -1,0 +1,14 @@
+# ================================
+# USERS HTTP TESTS
+# ================================
+
+# CREATE USER
+POST http://localhost/api/users
+Content-Type: application/json
+
+{
+  "nome": "Juca Bala",
+  "email": "juca@bala.com",
+  "senha": "12345",
+  "telefone": "555",
+}

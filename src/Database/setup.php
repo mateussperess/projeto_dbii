@@ -36,7 +36,7 @@ try {
   $table_token = "CREATE TABLE IF NOT EXISTS token (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     token TEXT NOT NULL,
-    expiredAt TEXT NOT NULL,
+    expiredAt INTEGER NOT NULL,
     id_user INTEGER NOT NULL,
     FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE
   )";
