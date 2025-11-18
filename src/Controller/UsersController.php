@@ -28,6 +28,13 @@ class UsersController
           $response = $this->service->getUserById($id);
           Response::send($response);
           break;
+        
+        case 'PUT':
+          $user = $this->validateBody($request->getBody(), $method);
+          $user["id"] = $id;
+          $response = $this->service->updateUser(...$user);
+          Response::send($response);
+          break;
 
         default:
           # code...

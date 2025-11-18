@@ -51,6 +51,30 @@ class UsersService
     return $user;
   }
 
+
+  public function updateUser(int $id, string $nome, string $email, string $senha, string $telefone, int $isAdmin): Users {
+    $user = new Users(
+      $id,
+      $nome,
+      $email, 
+      $senha,
+      $telefone,
+      $isAdmin
+    );
+
+    $user = $this->getUserById($id);
+    $user->setNome($nome);
+    $user->setEmail($email);
+    $user->setSenha($senha);
+    $user->setTelefone($telefone);
+    $user->setIsAdmin($isAdmin);
+
+    $this->validateUser($user);
+
+    $this->repository->update($user);
+    return $user;
+  }
+
   public function validateUser(Users $user)
   {
     if (strlen(trim($user->getNome())) < 5)
