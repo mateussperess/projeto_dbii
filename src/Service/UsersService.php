@@ -2,6 +2,8 @@
 
 namespace Service;
 
+use ArrayAccess;
+use Model\Users;
 use Repository\UsersRepository;
 
 class UsersService {
@@ -15,7 +17,17 @@ class UsersService {
     if(!$nome) {
       return $this->repository->findAll();
     } else {
-      return $this->repository->findAll();
+      return $this->repository->findByName($nome);
     }
   }
+
+  public function insert($data)
+  {
+    $result = $this->repository->insert(new Users(null, $data['nome'], $data['email'], $data['senha'], $data['telefone'], $data['isAdmin']));
+
+    if (!$result) return [];
+
+    return $result;
+  }
+
 }

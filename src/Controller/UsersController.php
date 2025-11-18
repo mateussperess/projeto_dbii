@@ -18,6 +18,7 @@ class UsersController
 
   public function proccessRequest(Request $request)
   {
+
     $id = $request->getId();
     $method = $request->getMethod();
 
@@ -34,6 +35,8 @@ class UsersController
           break;
 
         case 'POST':
+          $user = $this->service->insert($request->getBody());
+          // echo json_encode($user);
           // $user = $this->validateBody($request->getBody(), $method);
 
           // $response = $this->service->createNewUser(...$user);
