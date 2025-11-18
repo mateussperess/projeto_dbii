@@ -3,8 +3,10 @@
 namespace Repository;
 
 use Database\Database;
+use Error\APIException;
 use Model\Users;
 use PDO;
+use PDOException;
 
 class UsersRepository
 {
@@ -17,17 +19,24 @@ class UsersRepository
 
   public function insert(Users $user): Users|bool
   {
-    $stmt = $this->connection->prepare("INSERT INTO users (nome, email, senha, telefone, isAdmin) VALUES (:nome, :email, :senha, :telefone, :isAdmin)");
-    $stmt->bindValue(":nome", $user->getNome(), PDO::PARAM_STR);
-    $stmt->bindValue(":email", $user->getEmail(), PDO::PARAM_STR);
-    $stmt->bindValue(":senha", password_hash($user->getSenha(), PASSWORD_DEFAULT), PDO::PARAM_STR);
-    $stmt->bindValue(":telefone", $user->getTelefone(), PDO::PARAM_STR);
-    $stmt->bindValue(":isAdmin", $user->getIsAdmin());
-    $stmt->execute();
+    try {
+      $stmt = $this->connection->prepare("INSERT INTO users (nome, email, senha, telefone, isAdmin) VALUES (:nome, :email, :senha, :telefone, :isAdmin)");
+      $stmt->bindValue(":nome", $user->getNome(), PDO::PARAM_STR);
+      $stmt->bindValue(":email", $user->getEmail(), PDO::PARAM_STR);
+      $stmt->bindValue(":senha", password_hash($user->getSenha(), PASSWORD_DEFAULT), PDO::PARAM_STR);
+      $stmt->bindValue(":telefone", $user->getTelefone(), PDO::PARAM_STR);
+      $stmt->bindValue(":isAdmin", $user->getIsAdmin(), PDO::PARAM_INT);
 
-    return $user;
+      $stmt->execute();
+
+      $lastId = $this->connection->lastInsertId();
+      $user->setId($lastId);
+
+      return $user;
+    } catch (PDOException $e) {
+      throw new PDOException("Erro ao inserir usuário no banco de dados", 500);
+    }
   }
-
   public function findAll(): array|bool
   {
     $stmt = $this->connection->prepare("SELECT id, nome, email, telefone, isAdmin FROM users");
@@ -90,6 +99,28 @@ class UsersRepository
       email: $row["email"],
       telefone: $row["telefone"],
       isAdmin: $row["isAdmin"]
+    );
+
+    return $user;
+  }
+
+  public function findByEmail(string $email): ?Users
+  {
+    $stmt = $this->connection->prepare("SELECT * FROM users WHERE email LIKE :email");
+    $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+
+    $stmt->execute();
+
+    $row = $stmt->fetch();
+
+    if (!$row) return null;
+
+    $user = new Users(
+      $row["id"],
+      $row["nome"],
+      $row["email"],
+      $row["telefone"],
+      $row["isAdmin"],
     );
 
     return $user;

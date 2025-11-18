@@ -33,12 +33,37 @@ class UsersService
     return $user;
   }
 
-  public function insert($data): array|bool
+  public function insert(string $nome, string $email, string $senha, string $telefone, int $isAdmin): Users
   {
-    $result = $this->repository->insert(new Users(null, $data['nome'], $data['email'], $data['senha'], $data['telefone'], $data['isAdmin']));
+    $user = new Users(
+      null,
+      $nome,
+      $email,
+      $senha,
+      $telefone,
+      $isAdmin
+    );
 
-    if (!$result) return [];
+    $this->validateUser($user);
 
-    return $result;
+    $this->repository->insert($user);
+
+    return $user;
+  }
+
+  public function validateUser(Users $user)
+  {
+    if (strlen(trim($user->getNome())) < 5)
+      throw new APIException("Nome de usuário muito curto!", 400);
+
+    if (!filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL))
+      throw new APIException("Email inválido!", 400);
+
+    $userEmailAlreadyExists = $this->repository->findByEmail($user->getEmail());
+    if ($userEmailAlreadyExists) {
+      if ($userEmailAlreadyExists->getId() !== $user->getId()) {
+        throw new APIException("Este email já está em uso!", 409);
+      }
+    }
   }
 }

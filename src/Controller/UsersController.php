@@ -28,29 +28,23 @@ class UsersController
           $response = $this->service->getUserById($id);
           Response::send($response);
           break;
-        
+
         default:
           # code...
           break;
       }
-
     } else { // rotas que nao possuem um id
       switch ($method) {
         case 'GET':
           $nome = $request->getQuery()["nome"] ?? null;
-
           $response = $this->service->getUsers($nome);
-
           Response::send($response);
           break;
 
         case 'POST':
-          $user = $this->service->insert($request->getBody());
-          // echo json_encode($user);
-          // $user = $this->validateBody($request->getBody(), $method);
-
-          // $response = $this->service->createNewUser(...$user);
-          // Response::send($response, 201);
+          $user = $this->validateBody($request->getBody(), $method);
+          $response = $this->service->insert(...$user);
+          Response::send($response, 201);
           break;
 
         default:
@@ -59,5 +53,37 @@ class UsersController
     }
   }
 
-  // private function validateBody(array $body, string $method): array {}
+  private function validateBody(array $body, string $method): array
+  {
+    $user = [];
+
+    if ($method !== "PATCH") {
+      if (!isset($body["nome"])) {
+        throw new APIException("Campo nome é obrigatório!", 400);
+      }
+      $user["nome"] = $body["nome"];
+
+      if (!isset($body["email"])) {
+        throw new APIException("Campo email é obrigatório!", 400);
+      }
+      $user["email"] = $body["email"];
+
+      if (!isset($body["senha"])) {
+        throw new APIException("Campo senha é obrigatório!", 400);
+      }
+      $user["senha"] = $body["senha"];
+
+      if (!isset($body["telefone"])) {
+        throw new APIException("Campo telefone é obrigatório!", 400);
+      }
+      $user["telefone"] = $body["telefone"];
+
+      if (!isset($body["isAdmin"])) {
+        throw new APIException("Campo isAdmin é obrigatório!", 400);
+      }
+      $user["isAdmin"] = $body["isAdmin"];
+    }
+
+    return $user;
+  }
 }
