@@ -4,6 +4,7 @@ namespace Repository;
 
 use Database\Database;
 use Model\Users;
+use PDO;
 
 class UsersRepository {
   private $connection;
@@ -30,5 +31,20 @@ class UsersRepository {
     }
 
     return $users;
+  }
+
+  public function insert(Users $user): Users|bool
+  {
+    $stmt = $this->connection->prepare("INSERT INTO users (nome, email, senha, telefone, isAdmin) VALUES (:nome, :email, :senha, :telefone, :isAdmin)");
+    $stmt->bindValue(":nome", $user->getNome(), PDO::PARAM_STR);
+
+    $stmt->bindValue(":email", $user->getEmail(), PDO::PARAM_STR);
+    $stmt->bindValue(":senha", password_hash($user->getSenha(), PASSWORD_DEFAULT), PDO::PARAM_STR);
+    $stmt->bindValue(":telefone", $user->getTelefone(), PDO::PARAM_STR);
+    $stmt->bindValue(":isAdmin", $user->getIsAdmin());
+    $stmt->execute();
+    return false;
+
+    return $user;
   }
 }

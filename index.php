@@ -7,6 +7,10 @@ use Http\Response;
 
 require_once "src/config.php";
 
+ini_set('display_errors',1);
+ini_set('display_startup_erros',1);
+error_reporting(E_ALL);
+
 $uri = $_SERVER["REQUEST_URI"];
 $method = $_SERVER["REQUEST_METHOD"];
 $body = file_get_contents("php://input");
@@ -15,6 +19,7 @@ $request = new Request($uri, $method, $body);
 switch ($request->getResource()) {
   case 'users':
     $usersController = new UsersController();
+    $usersController->proccessRequest($request);
     break;
   case null:
     $endpoints = [
