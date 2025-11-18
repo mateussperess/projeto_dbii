@@ -51,11 +51,47 @@ class UsersRepository
     return $users;
   }
 
-  public function findByName(string $nome): array|bool {
+  public function findByName(string $nome): ?Users
+  {
     $stmt = $this->connection->prepare("SELECT id, nome, email, telefone, isAdmin FROM users WHERE nome LIKE :nome");
     $stmt->bindValue(":nome", $nome, PDO::PARAM_STR);
     $stmt->execute();
 
-    return $stmt->fetch();
+    $row = $stmt->fetch();
+
+    if (!$row) return null;
+
+    $user = new Users(
+      id: $row["id"],
+      nome: $row["nome"],
+      email: $row["email"],
+      telefone: $row["telefone"],
+      isAdmin: $row["isAdmin"]
+    );
+
+    return $user;
+  }
+
+  public function findUserById(string $id): ?Users
+  {
+    $stmt = $this->connection->prepare("SELECT * FROM users WHERE id = :id");
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $row = $stmt->fetch();
+
+    if (!$row) {
+      return null;
+    }
+
+    $user = new Users(
+      id: $row["id"],
+      nome: $row["nome"],
+      email: $row["email"],
+      telefone: $row["telefone"],
+      isAdmin: $row["isAdmin"]
+    );
+
+    return $user;
   }
 }

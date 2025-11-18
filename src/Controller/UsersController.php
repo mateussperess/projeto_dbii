@@ -23,6 +23,16 @@ class UsersController
     $method = $request->getMethod();
 
     if ($id !== null) { // rotas que possuem um id
+      switch ($method) {
+        case 'GET':
+          $response = $this->service->getUserById($id);
+          Response::send($response);
+          break;
+        
+        default:
+          # code...
+          break;
+      }
 
     } else { // rotas que nao possuem um id
       switch ($method) {
