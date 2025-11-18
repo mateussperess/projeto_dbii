@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Repository;
 
@@ -6,45 +6,56 @@ use Database\Database;
 use Model\Users;
 use PDO;
 
-class UsersRepository {
+class UsersRepository
+{
   private $connection;
 
-  public function __construct() {
+  public function __construct()
+  {
     $this->connection = Database::getConnection();
-  }
-
-  public function findAll(): array {
-    $sql = "SELECT * FROM users";
-    $stmt = $this->connection->prepare($sql);
-    $stmt->execute();
-
-    $users = [];
-
-    foreach ($users as $user) {
-      $user = new Users(
-        $user["id"],
-        $user["nome"],
-        $user["email"],
-        $user["telefone"],
-      );
-      $users[] = $user;
-    }
-
-    return $users;
   }
 
   public function insert(Users $user): Users|bool
   {
     $stmt = $this->connection->prepare("INSERT INTO users (nome, email, senha, telefone, isAdmin) VALUES (:nome, :email, :senha, :telefone, :isAdmin)");
     $stmt->bindValue(":nome", $user->getNome(), PDO::PARAM_STR);
-
     $stmt->bindValue(":email", $user->getEmail(), PDO::PARAM_STR);
     $stmt->bindValue(":senha", password_hash($user->getSenha(), PASSWORD_DEFAULT), PDO::PARAM_STR);
     $stmt->bindValue(":telefone", $user->getTelefone(), PDO::PARAM_STR);
     $stmt->bindValue(":isAdmin", $user->getIsAdmin());
     $stmt->execute();
-    return false;
 
     return $user;
+  }
+
+  public function findAll(): array|bool
+  {
+    $stmt = $this->connection->prepare("SELECT id, nome, email, telefone, isAdmin FROM users");
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+
+    $users = [];
+
+    foreach ($rows as $row) {
+      $user = new Users(
+        $row["id"],
+        $row["nome"],
+        $row["email"],
+        $row["telefone"],
+        $row["isAdmin"],
+      );
+
+      $users[] = $user;
+    }
+
+    return $users;
+  }
+
+  public function findByName(string $nome): array|bool {
+    $stmt = $this->connection->prepare("SELECT id, nome, email, telefone, isAdmin FROM users WHERE nome LIKE :nome");
+    $stmt->bindValue(":nome", $nome, PDO::PARAM_STR);
+    $stmt->execute();
+
+    return $stmt->fetch();
   }
 }

@@ -17,7 +17,7 @@ class UsersService {
     if(!$nome) {
       return $this->repository->findAll();
     } else {
-      return $this->repository->findAll();
+      return $this->repository->findByName($nome);
     }
   }
 
