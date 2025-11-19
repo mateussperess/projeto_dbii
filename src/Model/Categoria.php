@@ -8,7 +8,7 @@ class Categoria implements JsonSerializable
 {
   private ?int $id;
   private string $descricao;
-  public function __construct(?int $id = null, string $descricao)
+  public function __construct(?int $id = null, string $descricao = '')
   {
     $this->id = $id;
     $this->descricao = $descricao;

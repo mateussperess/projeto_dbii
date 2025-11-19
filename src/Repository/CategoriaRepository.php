@@ -15,4 +15,41 @@ class CategoriaRepository
   {
     $this->connection = Database::getConnection();
   }
+
+  public function findAll()
+  {
+    $stmt = $this->connection->prepare("SELECT id, descricao FROM categorias");
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+
+    $categorias = [];
+
+    foreach ($rows as $row) {
+      $categoria = new Categoria(
+        $row["id"],
+        $row["descricao"]
+      );
+
+      $categorias[] = $categoria;
+    }
+
+    return $categorias;
+  }
+  public function findByDescricao(string $descricao): ?Categoria
+  {
+    $stmt = $this->connection->prepare("SELECT id, descricao FROM categorias WHERE descricao LIKE :descricao");
+    $stmt->bindValue(":descricao", $descricao, PDO::PARAM_STR);
+    $stmt->execute();
+
+    $row = $stmt->fetch();
+
+    if (!$row) return null;
+
+    $categoria = new Categoria(
+      $row["id"],
+      $row["descricao"],
+    );
+
+    return $categoria;
+  }
 }

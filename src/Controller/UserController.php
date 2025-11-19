@@ -7,7 +7,7 @@ use Service\UserService;
 use Http\Request;
 use Http\Response;
 
-class UsersController
+class UserController
 {
   private UserService $service;
 

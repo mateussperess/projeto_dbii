@@ -1,14 +1,15 @@
 <?php
 
-use Controller\UsersController;
+use Controller\CategoriaController;
+use Controller\UserController;
 use Error\APIException;
 use Http\Request;
 use Http\Response;
 
 require_once "src/config.php";
 
-ini_set('display_errors',1);
-ini_set('display_startup_erros',1);
+ini_set('display_errors', 1);
+ini_set('display_startup_erros', 1);
 error_reporting(E_ALL);
 
 $uri = $_SERVER["REQUEST_URI"];
@@ -17,10 +18,16 @@ $body = file_get_contents("php://input");
 $request = new Request($uri, $method, $body);
 
 switch ($request->getResource()) {
-  case 'users':
-    $usersController = new UsersController();
-    $usersController->proccessRequest($request);
+  case 'user':
+    $userController = new UserController();
+    $userController->proccessRequest($request);
     break;
+
+  case "categoria":
+    $categoriasController = new CategoriaController();
+    $categoriasController->proccessRequest($request);
+    break;
+
   case null:
     $endpoints = [
       "GET /api/users"
