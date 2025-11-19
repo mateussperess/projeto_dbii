@@ -4,7 +4,7 @@ namespace Model;
 
 use JsonSerializable;
 
-class Livro implements JsonSerializable 
+class Livro implements JsonSerializable
 {
   private ?int $id;
   private string $titulo;
@@ -12,7 +12,7 @@ class Livro implements JsonSerializable
   private string $descricao;
   private int $ano;
   private int $numeroPaginas;
-  private int $isLocated;
+  private ?int $isAlocated;
   private ?int $numeroLocacoes;
   private int $idGenero;
 
@@ -23,25 +23,33 @@ class Livro implements JsonSerializable
     string $descricao,
     int $ano,
     int $numeroPaginas,
-    int $isLocated,
+    ?int $isAlocated,
     ?int $numeroLocacoes = null,
     int $idGenero
-  )
-  {
+  ) {
     $this->id = $id;
     $this->titulo = $titulo;
     $this->autor = $autor;
     $this->descricao = $descricao;
     $this->ano = $ano;
     $this->numeroPaginas = $numeroPaginas;
-    $this->isLocated = $isLocated;
+    $this->isAlocated = $isAlocated;
     $this->numeroLocacoes = $numeroLocacoes;
     $this->idGenero = $idGenero;
   }
 
   public function jsonSerialize(): mixed
   {
-    throw new \Exception('Not implemented');
+    return [
+      'id' => $this->id,
+      'titulo' => $this->titulo,
+      'autor' => $this->autor,
+      'descricao' => $this->descricao,
+      'ano' => $this->ano,
+      'n_paginas' => $this->numeroPaginas,
+      'isAlocated' => $this->isAlocated,
+      'id_genero' => $this->idGenero,
+    ];
   }
 
   // Getters
@@ -75,9 +83,9 @@ class Livro implements JsonSerializable
     return $this->numeroPaginas;
   }
 
-  public function getIsLocated()
+  public function getisAlocated()
   {
-    return $this->isLocated;
+    return $this->isAlocated;
   }
 
   public function getNumeroLocacoes()
@@ -121,9 +129,9 @@ class Livro implements JsonSerializable
     $this->numeroPaginas = $numeroPaginas;
   }
 
-  public function setIsLocated($isLocated)
+  public function setisAlocated($isAlocated)
   {
-    $this->isLocated = $isLocated;
+    $this->isAlocated = $isAlocated;
   }
 
   public function setNumeroLocacoes($numeroLocacoes)
