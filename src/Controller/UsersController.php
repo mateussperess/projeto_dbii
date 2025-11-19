@@ -3,17 +3,17 @@
 namespace Controller;
 
 use Error\APIException;
-use Service\UsersService;
+use Service\UserService;
 use Http\Request;
 use Http\Response;
 
 class UsersController
 {
-  private UsersService $service;
+  private UserService $service;
 
   public function __construct()
   {
-    $this->service = new UsersService();
+    $this->service = new UserService();
   }
 
   public function proccessRequest(Request $request)

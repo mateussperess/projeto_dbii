@@ -2,21 +2,20 @@
 
 namespace Service;
 
-use ArrayAccess;
 use Error\APIException;
-use Model\Users;
-use Repository\UsersRepository;
+use Model\User;
+use Repository\UserRepository;
 
-class UsersService
+class UserService
 {
-  private UsersRepository $repository;
+  private UserRepository $repository;
 
   public function __construct()
   {
-    $this->repository = new UsersRepository();
+    $this->repository = new UserRepository();
   }
 
-  public function getUsers(?string $nome): array|Users
+  public function getUsers(?string $nome): array|User
   {
     if (!$nome) return $this->repository->findAll();
 
@@ -26,16 +25,16 @@ class UsersService
     return $user;
   }
 
-  public function getUserById(int $id): Users
+  public function getUserById(int $id): User
   {
     $user = $this->repository->findUserById($id);
     if (!$user) throw new APIException("User not found!", 404);
     return $user;
   }
 
-  public function insert(string $nome, string $email, string $senha, string $telefone, int $isAdmin): Users
+  public function insert(string $nome, string $email, string $senha, string $telefone, int $isAdmin): User
   {
-    $user = new Users(
+    $user = new User(
       null,
       $nome,
       $email,
@@ -52,8 +51,8 @@ class UsersService
   }
 
 
-  public function updateUser(int $id, string $nome, string $email, string $senha, string $telefone, int $isAdmin): Users {
-    $user = new Users(
+  public function updateUser(int $id, string $nome, string $email, string $senha, string $telefone, int $isAdmin): User {
+    $user = new User(
       $id,
       $nome,
       $email, 
@@ -75,7 +74,7 @@ class UsersService
     return $user;
   }
 
-  public function validateUser(Users $user)
+  public function validateUser(User $user)
   {
     if (strlen(trim($user->getNome())) < 5)
       throw new APIException("Nome de usuário muito curto!", 400);

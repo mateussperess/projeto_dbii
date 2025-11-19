@@ -3,12 +3,11 @@
 namespace Repository;
 
 use Database\Database;
-use Error\APIException;
-use Model\Users;
+use Model\User;
 use PDO;
 use PDOException;
 
-class UsersRepository
+class UserRepository
 {
   private $connection;
 
@@ -17,7 +16,7 @@ class UsersRepository
     $this->connection = Database::getConnection();
   }
 
-  public function insert(Users $user): Users|bool
+  public function insert(User $user): User|bool
   {
     try {
       $stmt = $this->connection->prepare("INSERT INTO users (nome, email, senha, telefone, isAdmin) VALUES (:nome, :email, :senha, :telefone, :isAdmin)");
@@ -46,7 +45,7 @@ class UsersRepository
     $users = [];
 
     foreach ($rows as $row) {
-      $user = new Users(
+      $user = new User(
         $row["id"],
         $row["nome"],
         $row["email"],
@@ -60,7 +59,7 @@ class UsersRepository
     return $users;
   }
 
-  public function findByName(string $nome): ?Users
+  public function findByName(string $nome): ?User
   {
     $stmt = $this->connection->prepare("SELECT id, nome, email, telefone, isAdmin FROM users WHERE nome LIKE :nome");
     $stmt->bindValue(":nome", $nome, PDO::PARAM_STR);
@@ -70,7 +69,7 @@ class UsersRepository
 
     if (!$row) return null;
 
-    $user = new Users(
+    $user = new User(
       id: $row["id"],
       nome: $row["nome"],
       email: $row["email"],
@@ -81,7 +80,7 @@ class UsersRepository
     return $user;
   }
 
-  public function findUserById(string $id): ?Users
+  public function findUserById(string $id): ?User
   {
     $stmt = $this->connection->prepare("SELECT * FROM users WHERE id = :id");
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -93,7 +92,7 @@ class UsersRepository
       return null;
     }
 
-    $user = new Users(
+    $user = new User(
       id: $row["id"],
       nome: $row["nome"],
       email: $row["email"],
@@ -104,7 +103,7 @@ class UsersRepository
     return $user;
   }
 
-  public function findByEmail(string $email): ?Users
+  public function findByEmail(string $email): ?User
   {
     $stmt = $this->connection->prepare("SELECT * FROM users WHERE email LIKE :email");
     $stmt->bindValue(':email', $email, PDO::PARAM_STR);
@@ -115,7 +114,7 @@ class UsersRepository
 
     if (!$row) return null;
 
-    $user = new Users(
+    $user = new User(
       $row["id"],
       $row["nome"],
       $row["email"],
@@ -126,7 +125,7 @@ class UsersRepository
     return $user;
   }
 
-  public function update(Users $user): void {
+  public function update(User $user): void {
     $stmt = $this->connection->prepare("UPDATE users SET nome = :nome, email = :email, senha = :senha, telefone = :telefone, isAdmin = :isAdmin WHERE id = :id");
     $stmt->bindValue(":id", $user->getId(), PDO::PARAM_INT);
     $stmt->bindValue(":nome", $user->getNome(), PDO::PARAM_STR);

@@ -4,7 +4,7 @@ namespace Model;
 
 use JsonSerializable;
 
-class Users implements JsonSerializable
+class User implements JsonSerializable
 {
   private ?int $id;
   private string $nome;
