@@ -1,6 +1,7 @@
 <?php
 
 use Controller\CategoriaController;
+use Controller\LivroController;
 use Controller\UserController;
 use Error\APIException;
 use Http\Request;
@@ -26,6 +27,11 @@ switch ($request->getResource()) {
   case "categoria":
     $categoriasController = new CategoriaController();
     $categoriasController->proccessRequest($request);
+    break;
+
+  case "livro":
+    $livroController = new LivroController();
+    $livroController->proccessRequest($request);
     break;
 
   case null:

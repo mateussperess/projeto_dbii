@@ -33,8 +33,29 @@ class LivroService
     $this->repository->insert($livro);
     return $livro;
   }
+
+  public function getLivros(?string $titulo) : array|Livro {
+    if(!$titulo) return $this->repository->findAll();
+
+    $livro = $this->repository->findByTitulo($titulo);
+
+    if(!$livro) throw new APIException("Não existe um livro com o título informado!", 404);
+    return $livro;
+  }
   
-  public function validateLivro(Livro $livro) {
-    
+  private function validateLivro(Livro $livro) {
+    if(strlen($livro->getTitulo()) < 5) {
+      throw new APIException("O título do livro é muito curto!", 400);
+    }
+
+    if($livro->getAno() > 2025) {
+      throw new APIException("O ano de publicação do livro é inválido!", 400);
+    }
+
+    if($livro->getNumeroPaginas() < 0) {
+      throw new APIException("Quantidade de páginas inválidas!", 400);
+    }
+
+    // TODO: verificar se o gênero informado existe...
   }
 }

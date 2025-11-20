@@ -38,4 +38,55 @@ class LivroRepository
       throw new PDOException("Erro ao inserir livro no banco de dados: " . $e->getMessage(), 500);
     }
   }
+
+  public function findAll() : array|bool {
+    $stmt = $this->connection->prepare("SELECT id, titulo, autor, descricao, ano, n_paginas, isAlocated, n_alocated, id_genero FROM livros");
+    $stmt->execute();
+    
+    $rows = $stmt->fetchAll();
+
+    $livros = [];
+
+    foreach ($rows as $row) {
+      $livro = new Livro(
+        $row["id"],
+        $row["titulo"],
+        $row["autor"],
+        $row["descricao"],
+        $row["ano"],
+        $row["n_paginas"],
+        $row["isAlocated"],
+        $row["n_alocated"],
+        $row["id_genero"],
+      );
+
+      $livros[] = $livro;
+    }
+
+    return $livros;
+  }
+
+  public function findByTitulo(string $titulo): ?Livro {
+    $stmt = $this->connection->prepare("SELECT * FROM livros WHERE titulo LIKE :titulo");
+    $stmt->bindValue(":titulo", $titulo, PDO::PARAM_STR);
+    $stmt->execute();
+
+    $row = $stmt->fetch();
+
+    if(!$row) return null;
+
+    $livro = new Livro(
+      $row["id"],
+      $row["titulo"],
+      $row["autor"],
+      $row["descricao"],
+      $row["ano"],
+      $row["n_paginas"],
+      $row["isAlocated"],
+      $row["n_alocated"],
+      $row["id_genero"],
+    );
+
+    return $livro;
+  }
 }

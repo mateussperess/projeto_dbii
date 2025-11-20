@@ -18,14 +18,14 @@ class Livro implements JsonSerializable
 
   public function __construct(
     ?int $id = null,
-    string $titulo,
-    string $autor,
-    string $descricao,
-    int $ano,
-    int $numeroPaginas,
-    ?int $isAlocated,
-    ?int $numeroLocacoes = null,
-    int $idGenero
+    string $titulo = '',
+    string $autor = '',
+    string $descricao = '',
+    int $ano = 0,
+    int $numeroPaginas = 0,
+    int $isAlocated = 0,
+    int $numeroLocacoes = 0,
+    int $idGenero = 0
   ) {
     $this->id = $id;
     $this->titulo = $titulo;
