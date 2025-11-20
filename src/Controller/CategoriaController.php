@@ -2,6 +2,7 @@
 
 namespace Controller;
 
+use Error\APIException;
 use Http\Request;
 use Http\Response;
 use Service\CategoriaService;
@@ -31,10 +32,31 @@ class CategoriaController
           Response::send($response);
           break;
 
+        case 'POST':
+          $categoria = $this->validateBody($request->getBody(), $method);
+          $response = $this->service->insert(...$categoria);
+          Response::send($response, 201);
+          break;
+
         default:
           # code...
           break;
       }
     }
+  }
+
+  private function validateBody(array $body, string $method): array
+  {
+    $categoria = [];
+
+    if ($method !== "PATCH") {
+      if (!isset($body["descricao"])) {
+        throw new APIException("Campo descricao é obrigatório!", 400);
+      }
+
+      $categoria["descricao"] = $body["descricao"];
+    }
+
+    return $categoria;
   }
 }

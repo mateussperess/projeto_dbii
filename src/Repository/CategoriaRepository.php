@@ -52,4 +52,20 @@ class CategoriaRepository
 
     return $categoria;
   }
+
+  public function insert(Categoria $categoria): Categoria|bool
+  {
+    try {
+      $stmt = $this->connection->prepare("INSERT INTO categorias (descricao) VALUES (:descricao)");
+      $stmt->bindValue(":descricao", $categoria->getDescricao(), PDO::PARAM_STR);
+
+      $stmt->execute();
+
+      $lastId = $this->connection->lastInsertId();
+      $categoria->setId($lastId);
+      return $categoria;
+    } catch (PDOException $e) {
+      throw new PDOException("Erro ao inserir categoria no banco de dados", 500);
+    }
+  }
 }

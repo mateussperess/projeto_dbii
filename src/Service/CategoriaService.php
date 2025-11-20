@@ -25,4 +25,29 @@ class CategoriaService
 
     return $categoria; 
   }
+
+  public function insert(string $descricao): Categoria {
+    $categoria = new Categoria(
+      null,
+      $descricao
+    );
+
+    $this->validateCategoria($categoria);
+
+    $this->repository->insert($categoria);
+    return $categoria;
+  }
+
+  private function validateCategoria(Categoria $categoria) {
+    if(strlen($categoria->getDescricao()) < 5) {
+      throw new APIException("Nome de categoria muito curta!", 400);
+    }
+
+    $categoriaAlreadyExists = $this->repository->findByDescricao($categoria->getDescricao());
+    if($categoriaAlreadyExists) {
+      if($categoriaAlreadyExists !== $categoria->getId()) {
+        throw new APIException("Esta categoria já está em uso!", 409);
+      }
+    }
+  }
 }
