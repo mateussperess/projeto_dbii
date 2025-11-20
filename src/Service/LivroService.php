@@ -23,8 +23,8 @@ class LivroService
       $descricao,
       $ano,
       $n_paginas,
-      null,
-      null,
+      0,
+      0,
       $id_genero
     );
 
