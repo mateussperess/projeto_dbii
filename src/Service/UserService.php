@@ -25,9 +25,17 @@ class UserService
     return $user;
   }
 
+
   public function getUserById(int $id): User
   {
     $user = $this->repository->findUserById($id);
+    if (!$user) throw new APIException("User not found!", 404);
+    return $user;
+  }
+
+  public function getUserByEmail(string $email): User
+  {
+    $user = $this->repository->findByEmail($email);
     if (!$user) throw new APIException("User not found!", 404);
     return $user;
   }

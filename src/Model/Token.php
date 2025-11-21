@@ -14,8 +14,9 @@ class Token implements JsonSerializable
   public function __construct(
     ?int $id = null,
     string $token = "",
-    ?int $idUser = 0,
-    ?int $expiredAt = 0
+    ?int $expiredAt = 0,
+    ?int $idUser = 0
+    
   ) {
     $this->id = $id;
     $this->token = $token;

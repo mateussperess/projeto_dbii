@@ -118,6 +118,7 @@ class UserRepository
       $row["id"],
       $row["nome"],
       $row["email"],
+      $row["senha"],
       $row["telefone"],
       $row["isAdmin"],
     );

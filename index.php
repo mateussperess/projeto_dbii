@@ -3,6 +3,7 @@
 use Controller\CategoriaController;
 use Controller\LivroController;
 use Controller\UserController;
+use Controller\TokenController;
 use Error\APIException;
 use Http\Request;
 use Http\Response;
@@ -34,6 +35,11 @@ switch ($request->getResource()) {
     $livroController->proccessRequest($request);
     break;
 
+  case "token":
+    $tokenController = new TokenController();
+    $tokenController->proccessRequest($request);
+    break;
+
   case null:
     $endpoints = [
       "GET /api/users"
@@ -43,5 +49,5 @@ switch ($request->getResource()) {
     break;
 
   default:
-    throw new APIException("Resource not found!", 404);
+    throw new APIException("Resource not found!", 406);
 }
