@@ -18,15 +18,18 @@ class UserController
 
   public function proccessRequest(Request $request)
   {
-
     $id = $request->getId();
     $method = $request->getMethod();
-    $authenticatedUser = $request->getAuthenticatedUser();
-
+    // ❌ REMOVE DAQUI: $authenticatedUser = $request->getAuthenticatedUser();
 
     if ($id !== null) { // rotas que possuem um id
       switch ($method) {
         case 'GET':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser && (int) $authenticatedUser->getId() != $id || (int) $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado! Apenas administradores podem listar usuários pelo ID.", 403);
+          }
+
           $response = $this->service->getUserById($id);
           Response::send($response);
           break;
@@ -39,12 +42,17 @@ class UserController
           break;
 
         default:
-          # code...
-          break;
+          throw new APIException("Method not allowed!", 405);
       }
     } else { // rotas que nao possuem um id
       switch ($method) {
         case 'GET':
+          $authenticatedUser = $request->getAuthenticatedUser();
+
+          if (!$authenticatedUser || (int) $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado! Apenas administradores podem listar usuários.", 403);
+          }
+
           $nome = $request->getQuery()["nome"] ?? null;
           $response = $this->service->getUsersWithPermission($authenticatedUser, $nome);
           Response::send($response);
@@ -52,6 +60,9 @@ class UserController
 
         case 'POST':
           $user = $this->validateBody($request->getBody(), $method);
+
+          $user["isAdmin"] = 0;
+
           $response = $this->service->insert(...$user);
           Response::send($response, 201);
           break;
