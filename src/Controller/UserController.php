@@ -21,6 +21,8 @@ class UserController
 
     $id = $request->getId();
     $method = $request->getMethod();
+    $authenticatedUser = $request->getAuthenticatedUser();
+
 
     if ($id !== null) { // rotas que possuem um id
       switch ($method) {
@@ -28,7 +30,7 @@ class UserController
           $response = $this->service->getUserById($id);
           Response::send($response);
           break;
-        
+
         case 'PUT':
           $user = $this->validateBody($request->getBody(), $method);
           $user["id"] = $id;
@@ -44,7 +46,7 @@ class UserController
       switch ($method) {
         case 'GET':
           $nome = $request->getQuery()["nome"] ?? null;
-          $response = $this->service->getUsers($nome);
+          $response = $this->service->getUsersWithPermission($authenticatedUser, $nome);
           Response::send($response);
           break;
 

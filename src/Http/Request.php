@@ -3,6 +3,8 @@
 namespace Http;
 
 use Error\APIException;
+use Model\User;
+use Service\TokenService;
 
 class Request
 {
@@ -56,7 +58,34 @@ class Request
       $this->body = [];
     }
   }
+  public function getAuthenticatedUser(): User
+  {
+    return $this->validateToken();
+  }
 
+  private function validateToken(): User
+  {
+    $headers = getallheaders();
+
+    // var_dump($headers);
+    // exit;
+
+    if (!isset($headers['authorization'])) {
+      throw new APIException("Usuário não autenticado!", 401);
+    }
+
+    $authHeader = $headers['authorization'];
+
+    if (!preg_match('/Bearer\s+(.+)/', $authHeader, $matches)) {
+      throw new APIException("Formato de token inválido!", 401);
+    }
+
+    $token = $matches[1];
+
+    $tokenService = new TokenService();
+    return $tokenService->getUserByValidToken($token);
+  }
+  
   // Getters
   public function getResource(): string
   {
