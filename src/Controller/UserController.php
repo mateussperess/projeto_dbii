@@ -34,6 +34,11 @@ class UserController
           break;
 
         case 'PUT':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if ((int) $authenticatedUser->getId() != $id || (int) $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado! Apenas administradores podem alterar dados dos usuários.", 403);
+          }
+
           $user = $this->validateBody($request->getBody(), $method);
           $user["id"] = $id;
           $response = $this->service->updateUser(...$user);
