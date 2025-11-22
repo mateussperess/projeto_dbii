@@ -40,6 +40,9 @@ switch ($request->getResource()) {
     $tokenController = new TokenController();
     $tokenController->proccessRequest($request);
     break;
+  
+  case "emprestimo":
+    break;
 
   case null:
     $endpoints = [

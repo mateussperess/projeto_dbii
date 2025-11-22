@@ -20,7 +20,6 @@ class UserController
   {
     $id = $request->getId();
     $method = $request->getMethod();
-    // ❌ REMOVE DAQUI: $authenticatedUser = $request->getAuthenticatedUser();
 
     if ($id !== null) { // rotas que possuem um id
       switch ($method) {
