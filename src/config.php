@@ -23,10 +23,10 @@ function exceptionHandler(Throwable $exception)
   if ($exception instanceof APIException) {
     Response::send(["message" => $exception->getMessage()], $exception->getCode());
   } else {
-    error_log("EXCEPTION NÃO CAPTURADA: " . get_class($exception));
-    error_log("Message: " . $exception->getMessage());
-    error_log("File: " . $exception->getFile() . ":" . $exception->getLine());
-    error_log("Trace: " . $exception->getTraceAsString());
+    // error_log("EXCEPTION NÃO CAPTURADA: " . get_class($exception));
+    // error_log("Message: " . $exception->getMessage());
+    // error_log("File: " . $exception->getFile() . ":" . $exception->getLine());
+    // error_log("Trace: " . $exception->getTraceAsString());
     Response::send(["message" => "Unable to process this request!"], 500);
   }
 }

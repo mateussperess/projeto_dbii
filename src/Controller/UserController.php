@@ -109,6 +109,8 @@ class UserController
 
       if (isset($body["isAdmin"])) {
         $user["isAdmin"] = $body["isAdmin"];
+      } else {
+        $user["isAdmin"] = 0;
       }
     }
 
