@@ -46,10 +46,43 @@ switch ($request->getResource()) {
 
   case null:
     $endpoints = [
-      "GET /api/users"
+      "/api/token" => [
+        "POST" => [
+          "description" => "Gerar token de autenticação",
+          "auth" => false,
+          "body" => "required"
+        ]
+      ],
+      "/api/user" => [
+        "POST" => [
+          "description" => "Criar novo usuário",
+          "auth" => false,
+          "body" => "required"
+        ],
+        "GET" => [
+          "description" => "Listar todos os usuários",
+          "auth" => true,
+          "params" => "?nome=fulano (opcional)"
+        ]
+      ],
+      "/api/user/{id}" => [
+        "GET" => [
+          "description" => "Buscar usuário específico",
+          "auth" => true,
+          "example" => "/api/user/1"
+        ],
+        "PUT" => [
+          "description" => "Atualizar usuário",
+          "auth" => true,
+          "body" => "required"
+        ]
+      ]
     ];
 
-    Response::send(["endpoints" => $endpoints]);
+    Response::send([
+      "message" => "API de Biblioteca - Endpoints disponíveis",
+      "endpoints" => $endpoints
+    ]);
     break;
 
   default:

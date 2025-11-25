@@ -25,8 +25,8 @@ class UserController
       switch ($method) {
         case 'GET':
           $authenticatedUser = $request->getAuthenticatedUser();
-          if (!$authenticatedUser && (int) $authenticatedUser->getId() != $id || (int) $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado! Apenas administradores podem listar usuários pelo ID.", 403);
+          if ((int) $authenticatedUser->getId() != $id && (int) $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado! Você só pode ver seus próprios dados.", 403);
           }
 
           $response = $this->service->getUserById($id);
@@ -35,11 +35,16 @@ class UserController
 
         case 'PUT':
           $authenticatedUser = $request->getAuthenticatedUser();
-          if ((int) $authenticatedUser->getId() != $id || (int) $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado! Apenas administradores podem alterar dados dos usuários.", 403);
+          if ((int) $authenticatedUser->getId() != $id && (int) $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado! Você só pode alterar seus próprios dados.", 403);
           }
 
           $user = $this->validateBody($request->getBody(), $method);
+
+          if ((int) $authenticatedUser->getIsAdmin() != 1 && isset($user["isAdmin"])) {
+            throw new APIException("Acesso negado! Apenas administradores podem alterar permissões.", 403);
+          }
+
           $user["id"] = $id;
           $response = $this->service->updateUser(...$user);
           Response::send($response);
@@ -102,10 +107,9 @@ class UserController
       }
       $user["telefone"] = $body["telefone"];
 
-      if (!isset($body["isAdmin"])) {
-        throw new APIException("Campo isAdmin é obrigatório!", 400);
+      if (isset($body["isAdmin"])) {
+        $user["isAdmin"] = $body["isAdmin"];
       }
-      $user["isAdmin"] = $body["isAdmin"];
     }
 
     return $user;
