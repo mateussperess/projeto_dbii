@@ -107,10 +107,9 @@ class UserController
       }
       $user["telefone"] = $body["telefone"];
 
+      $user["isAdmin"] = 0;
       if (isset($body["isAdmin"])) {
         $user["isAdmin"] = $body["isAdmin"];
-      } else {
-        $user["isAdmin"] = 0;
       }
     }
 
