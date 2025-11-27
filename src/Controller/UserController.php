@@ -46,7 +46,15 @@ class UserController
           }
 
           $user["id"] = $id;
-          $response = $this->service->updateUser(...$user);
+          $response = $this->service->updateUser(
+            $user["id"],
+            $user["nome"],
+            $user["email"],
+            $user["senha"],
+            $user["telefone"],
+            $user["isAdmin"] ?? null
+          );
+          
           Response::send($response);
           break;
 
@@ -107,7 +115,6 @@ class UserController
       }
       $user["telefone"] = $body["telefone"];
 
-      $user["isAdmin"] = 0;
       if (isset($body["isAdmin"])) {
         $user["isAdmin"] = $body["isAdmin"];
       }
