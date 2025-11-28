@@ -18,7 +18,6 @@ class TokenRepository
 
   public function insert(Token $token): Token|bool
   {
-    
     try {
       
       $stmt = $this->connection->prepare("INSERT INTO token (token, expiredAt, id_user) VALUES (:token, :expiredAt, :id_user)");
@@ -42,21 +41,13 @@ class TokenRepository
 
   public function update(Token $token): Token|bool
   {
-    
     try {
-      
       $stmt = $this->connection->prepare("UPDATE token SET token = :token, expiredAt = :expiredAt WHERE id_user = :id_user");
-
-
-      
       $stmt->bindValue(":token", $token->getToken(), PDO::PARAM_STR);
       $stmt->bindValue(":expiredAt", $token->getExpiredAt(), PDO::PARAM_INT);
       $stmt->bindValue(":id_user", $token->getIdUser(), PDO::PARAM_INT);
 
       $stmt->execute();
-
-      $lastId = $this->connection->lastInsertId();
-      $token->setId($lastId);
 
       return $token;
     } catch (PDOException $e) {

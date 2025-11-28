@@ -18,60 +18,38 @@ class UserController
 
   public function proccessRequest(Request $request)
   {
+
     $id = $request->getId();
     $method = $request->getMethod();
 
     if ($id !== null) { // rotas que possuem um id
       switch ($method) {
         case 'GET':
-          $authenticatedUser = $request->getAuthenticatedUser();
-          if ((int) $authenticatedUser->getId() != $id && (int) $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado! Você só pode ver seus próprios dados.", 403);
-          }
-
           $response = $this->service->getUserById($id);
           Response::send($response);
           break;
-
+        
         case 'PUT':
-          $authenticatedUser = $request->getAuthenticatedUser();
-          if ((int) $authenticatedUser->getId() != $id && (int) $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado! Você só pode alterar seus próprios dados.", 403);
-          }
-
           $user = $this->validateBody($request->getBody(), $method);
-
-          if ((int) $authenticatedUser->getIsAdmin() != 1 && isset($user["isAdmin"])) {
-            throw new APIException("Acesso negado! Apenas administradores podem alterar permissões.", 403);
-          }
-
           $user["id"] = $id;
           $response = $this->service->updateUser(...$user);
           Response::send($response);
           break;
 
         default:
-          throw new APIException("Method not allowed!", 405);
+          # code...
+          break;
       }
     } else { // rotas que nao possuem um id
       switch ($method) {
         case 'GET':
-          $authenticatedUser = $request->getAuthenticatedUser();
-
-          if (!$authenticatedUser || (int) $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado! Apenas administradores podem listar usuários.", 403);
-          }
-
           $nome = $request->getQuery()["nome"] ?? null;
-          $response = $this->service->getUsersWithPermission($authenticatedUser, $nome);
+          $response = $this->service->getUsers($nome);
           Response::send($response);
           break;
 
         case 'POST':
           $user = $this->validateBody($request->getBody(), $method);
-
-          $user["isAdmin"] = 0;
-
           $response = $this->service->insert(...$user);
           Response::send($response, 201);
           break;
@@ -107,11 +85,10 @@ class UserController
       }
       $user["telefone"] = $body["telefone"];
 
-      if (isset($body["isAdmin"])) {
-        $user["isAdmin"] = $body["isAdmin"];
-      } else {
-        $user["isAdmin"] = 0;
+      if (!isset($body["isAdmin"])) {
+        throw new APIException("Campo isAdmin é obrigatório!", 400);
       }
+      $user["isAdmin"] = $body["isAdmin"];
     }
 
     return $user;
