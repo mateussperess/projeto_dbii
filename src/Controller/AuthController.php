@@ -27,6 +27,14 @@ class AuthController
                 
                 Response::send($token, 201);
                 break;
+            case "DELETE": 
+                $user = $request->getAuthenticatedUser();
+                $this->authService->logout($user);
+
+                Response::send([
+                    "status" => "success"
+                ], 200);
+                break;
             default:
                 throw new APIException("Method not allowed!", 405);
         }

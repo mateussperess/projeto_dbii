@@ -6,12 +6,10 @@ use Error\APIException;
 use Model\Token;
 use Model\User;
 use Repository\TokenRepository;
-use Service\UserService;
 
 class TokenService
 {
   private TokenRepository $tokenRepository;
-  private UserService $userService;
 
   private const TOKEN_EXPIRATION = 3600; // 1 horinha
 
@@ -21,16 +19,15 @@ class TokenService
     $this->tokenRepository = new TokenRepository();
   }
 
-  public function insert(string $token, int $expired_at, int $userID): Token
+  public function insert(string $token, int $expiresAt, int $userID): Token
   {
     $token = new Token(
       null,
       $token,
-      $expired_at,
+      $expiresAt,
       $userID
     );
 
-    $this->validateToken($token);
     $this->tokenRepository->insert($token);
     return $token;
   }
@@ -74,15 +71,13 @@ class TokenService
     }
   }
 
-  public function tokenIsValid(string $token): bool
+  public function tokenIsValid(?Token $token): bool
   {
-    $searchToken = $this->tokenRepository->findByToken($token);
-
-    if (!$searchToken) {
+    if (!$token) {
       throw new APIException("Token Invalido, necessário autenticação", 400);
     }
 
-    if ($searchToken->getExpiredAt() < time()) {
+    if ($token->getExpiredAt() < time()) {
       throw new APIException("Token Expirado, necessário autenticação", 400);
     }
 
@@ -91,11 +86,16 @@ class TokenService
 
   public function getUserByValidToken(string $token): User
   {
-    $this->tokenIsValid($token);
+    $userToken = $this->tokenRepository->findByToken($token);
+    $this->tokenIsValid($userToken);
 
-    $tokenData = $this->tokenRepository->findByToken($token);
     $userService = new UserService();
-    return $userService->getUserById($tokenData->getIdUser());
+    return $userService->getUserById($userToken->getIdUser());
+  }
+
+  public function deleteTokenByUser(User $user): bool
+  { 
+    return $this->tokenRepository->deleteByUserId($user->getId());
   }
 
   private function generateToken(string $email): string
