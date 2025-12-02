@@ -25,11 +25,17 @@ class UserService
     return $user;
   }
 
+
   public function getUserById(int $id): User
   {
     $user = $this->repository->findUserById($id);
     if (!$user) throw new APIException("User not found!", 404);
     return $user;
+  }
+
+  public function getUserByEmail(string $email): ?User
+  {
+    return $this->repository->findByEmail($email);
   }
 
   public function insert(string $nome, string $email, string $senha, string $telefone, int $isAdmin): User
@@ -51,11 +57,12 @@ class UserService
   }
 
 
-  public function updateUser(int $id, string $nome, string $email, string $senha, string $telefone, int $isAdmin): User {
+  public function updateUser(int $id, string $nome, string $email, string $senha, string $telefone, int $isAdmin): User
+  {
     $user = new User(
       $id,
       $nome,
-      $email, 
+      $email,
       $senha,
       $telefone,
       $isAdmin
@@ -88,5 +95,22 @@ class UserService
         throw new APIException("Este email já está em uso!", 409);
       }
     }
+  }
+
+  public function getUsersWithPermission(User $authenticatedUser, ?string $nome): array|User
+  {
+    if (!$this->isAdmin($authenticatedUser)) {
+      if ($nome) {
+        throw new APIException("Você não tem permissão para buscar outros usuários!", 403);
+      }
+      return $this->getUserById($authenticatedUser->getId());
+    }
+
+    return $this->getUsers($nome);
+  }
+
+  public function isAdmin(User $user): bool
+  {
+    return $user->getIsAdmin() !== 0;
   }
 }
