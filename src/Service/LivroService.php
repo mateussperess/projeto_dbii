@@ -42,6 +42,14 @@ class LivroService
     if(!$livro) throw new APIException("Não existe um livro com o título informado!", 404);
     return $livro;
   }
+
+  public function getLivroById(int $id): array|Livro {
+    if(!$id) return $this->repository->findAll();
+
+    $livro = $this->repository->findLivroById($id);
+
+    return $livro;
+  }
   
   private function validateLivro(Livro $livro) {
     if(strlen($livro->getTitulo()) < 5) {

@@ -57,27 +57,22 @@ class UserService
   }
 
 
-  public function updateUser(int $id, string $nome, string $email, string $senha, string $telefone, int $isAdmin): User
+  public function updateUser(int $id, string $nome, string $email, string $senha, string $telefone, ?int $isAdmin = null): User
   {
-    $user = new User(
-      $id,
-      $nome,
-      $email,
-      $senha,
-      $telefone,
-      $isAdmin
-    );
-
     $user = $this->getUserById($id);
+
     $user->setNome($nome);
     $user->setEmail($email);
     $user->setSenha($senha);
     $user->setTelefone($telefone);
-    $user->setIsAdmin($isAdmin);
+
+    if ($isAdmin !== null) {
+      $user->setIsAdmin($isAdmin);
+    }
 
     $this->validateUser($user);
-
     $this->repository->update($user);
+
     return $user;
   }
 
