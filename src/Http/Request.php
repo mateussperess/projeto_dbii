@@ -58,25 +58,17 @@ class Request
       $this->body = [];
     }
   }
-  public function getAuthenticatedUser(): User
+  public function getAuthenticatedUser(): ?User
   {
     return $this->validateToken();
   }
 
-  private function validateToken(): User
+  private function validateToken(): ?User
   {
     $headers = getallheaders();
+    $authHeader = $headers["Authorization"] ?? $headers["authorization"] ?? null;
 
-    // var_dump($headers);
-    // exit;
-
-    if (!isset($headers['authorization'])) {
-      throw new APIException("Usuário não autenticado!", 401);
-    }
-
-    $authHeader = $headers['authorization'];
-
-    if (!preg_match('/Bearer\s+(.+)/', $authHeader, $matches)) {
+    if (!isset($authHeader) || !preg_match('/Bearer\s+(.+)/', $authHeader, $matches)) {
       throw new APIException("Formato de token inválido!", 401);
     }
 

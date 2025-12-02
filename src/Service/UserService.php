@@ -33,11 +33,9 @@ class UserService
     return $user;
   }
 
-  public function getUserByEmail(string $email): User
+  public function getUserByEmail(string $email): ?User
   {
-    $user = $this->repository->findByEmail($email);
-    if (!$user) throw new APIException("User not found!", 404);
-    return $user;
+    return $this->repository->findByEmail($email);
   }
 
   public function insert(string $nome, string $email, string $senha, string $telefone, int $isAdmin): User

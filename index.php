@@ -1,5 +1,6 @@
 <?php
 
+use Controller\AuthController;
 use Controller\CategoriaController;
 use Controller\LivroController;
 use Controller\UserController;
@@ -36,9 +37,9 @@ switch ($request->getResource()) {
     $livroController->proccessRequest($request);
     break;
 
-  case "token":
-    $tokenController = new TokenController();
-    $tokenController->proccessRequest($request);
+  case "auth":
+    $authController = new AuthController();
+    $authController->proccessRequest($request);
     break;
   
   case "emprestimo":

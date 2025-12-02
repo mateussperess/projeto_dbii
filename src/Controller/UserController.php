@@ -18,68 +18,66 @@ class UserController
 
   public function proccessRequest(Request $request)
   {
+
     $id = $request->getId();
     $method = $request->getMethod();
 
     if ($id !== null) { // rotas que possuem um id
       switch ($method) {
         case 'GET':
-          $authenticatedUser = $request->getAuthenticatedUser();
-          if ((int) $authenticatedUser->getId() != $id && (int) $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado! Você só pode ver seus próprios dados.", 403);
+          $response = $this->service->getUserById($id);
+          $user = $request->getAuthenticatedUser();
+
+          if ($user->getId() != $id && $user->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
           }
 
-          $response = $this->service->getUserById($id);
           Response::send($response);
           break;
 
         case 'PUT':
           $authenticatedUser = $request->getAuthenticatedUser();
-          if ((int) $authenticatedUser->getId() != $id && (int) $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado! Você só pode alterar seus próprios dados.", 403);
+          
+          if ($authenticatedUser->getId() != $id && $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
           }
 
           $user = $this->validateBody($request->getBody(), $method);
-
-          if ((int) $authenticatedUser->getIsAdmin() != 1 && isset($user["isAdmin"])) {
-            throw new APIException("Acesso negado! Apenas administradores podem alterar permissões.", 403);
-          }
-
           $user["id"] = $id;
-          $response = $this->service->updateUser(
-            $user["id"],
-            $user["nome"],
-            $user["email"],
-            $user["senha"],
-            $user["telefone"],
-            $user["isAdmin"] ?? null
-          );
           
+          $currentUser = $this->service->getUserById($id);
+          
+          if (!isset($user["isAdmin"])) {
+            $user["isAdmin"] = $currentUser->getIsAdmin();
+          } else if ($authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado para alterar o campo isAdmin!", 403);
+          }
+          
+          $response = $this->service->updateUser(...$user);
           Response::send($response);
           break;
 
         default:
-          throw new APIException("Method not allowed!", 405);
+          # code...
+          break;
       }
     } else { // rotas que nao possuem um id
       switch ($method) {
         case 'GET':
-          $authenticatedUser = $request->getAuthenticatedUser();
+          $nome = $request->getQuery()["nome"] ?? null;
 
-          if (!$authenticatedUser || (int) $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado! Apenas administradores podem listar usuários.", 403);
+          $user = $request->getAuthenticatedUser();
+
+          if ($user->getId() != $id && $user->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
           }
 
-          $nome = $request->getQuery()["nome"] ?? null;
-          $response = $this->service->getUsersWithPermission($authenticatedUser, $nome);
+          $response = $this->service->getUsers($nome);
           Response::send($response);
           break;
 
         case 'POST':
           $user = $this->validateBody($request->getBody(), $method);
-
-          $user["isAdmin"] = 0;
-
           $response = $this->service->insert(...$user);
           Response::send($response, 201);
           break;
@@ -94,7 +92,33 @@ class UserController
   {
     $user = [];
 
-    if ($method !== "PATCH") {
+    if ($method === "POST") {
+      if (!isset($body["nome"])) {
+        throw new APIException("Campo nome é obrigatório!", 400);
+      }
+      $user["nome"] = $body["nome"];
+
+      if (!isset($body["email"])) {
+        throw new APIException("Campo email é obrigatório!", 400);
+      }
+      $user["email"] = $body["email"];
+
+      if (!isset($body["senha"])) {
+        throw new APIException("Campo senha é obrigatório!", 400);
+      }
+      $user["senha"] = $body["senha"];
+
+      if (!isset($body["telefone"])) {
+        throw new APIException("Campo telefone é obrigatório!", 400);
+      }
+      $user["telefone"] = $body["telefone"];
+
+      if (!isset($body["isAdmin"])) {
+        throw new APIException("Campo isAdmin é obrigatório!", 400);
+      }
+      $user["isAdmin"] = $body["isAdmin"];
+    
+    } else if ($method === "PUT") {
       if (!isset($body["nome"])) {
         throw new APIException("Campo nome é obrigatório!", 400);
       }

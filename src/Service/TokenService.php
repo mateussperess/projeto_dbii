@@ -6,93 +6,57 @@ use Error\APIException;
 use Model\Token;
 use Model\User;
 use Repository\TokenRepository;
-use Service\UserService;
 
 class TokenService
 {
-  private TokenRepository $repository;
-  private UserService $userService;
+  private TokenRepository $tokenRepository;
 
   private const TOKEN_EXPIRATION = 3600; // 1 horinha
 
 
   public function __construct()
   {
-    $this->repository = new TokenRepository();
+    $this->tokenRepository = new TokenRepository();
   }
 
-  public function insert(string $token, int $expired_at, int $userID): Token
+  public function insert(string $token, int $expiresAt, int $userID): Token
   {
     $token = new Token(
       null,
       $token,
-      $expired_at,
+      $expiresAt,
       $userID
     );
 
-    $this->validateToken($token);
-    $this->repository->insert($token);
+    $this->tokenRepository->insert($token);
     return $token;
   }
 
-  public function update(string $token, int $expired_at, int $userID): Token
+  public function update(string $newToken, int $expiresAt, int $userID): Token
   {
-    $token = new Token(
-      null,
-      $token,
-      $expired_at,
-      $userID
-    );
+    $token = $this->tokenRepository->findByUser($userID);
+    $token->setToken($newToken);
+    $token->setExpiredAt($expiresAt);
 
-    $this->validateToken($token);
-    $this->repository->update($token);
+    $this->tokenRepository->update($token);
     return $token;
   }
 
-  public function verifyLogin(string $email, string $senha): Token
+  public function generateOrUpdateToken(User $user): Token
   {
-    $this->userService = new UserService;
-
-    $user = $this->userService->getUserByEmail($email);
-
-    if (!$user) {
-      throw new APIException("User not found!", 404);
-    } else {
-
-      if (!password_verify($senha, $user->getSenha())) {
-        throw new APIException("Falha de Autenticação!", 404);
-      }
-
-      $token = '';
-      $newToken = $this->generateToken($user->getEmail());
+      $generatedToken = $this->generateToken($user->getEmail());
       $expirationTime = time() + self::TOKEN_EXPIRATION;
 
       if ($this->tokenExists($user->getId())) {
-        $token = $this->update($newToken, $expirationTime, $user->getId());
-      } else {
-        $token = $this->insert($newToken, $expirationTime, $user->getId());
+        return $this->update($generatedToken, $expirationTime, $user->getId());
       }
-
-      return $token;
-    }
-  }
-
-  private function generateToken($email): string
-  {
-    $userEmail = $email;
-    $timeStamp = time();
-    $tompero = "hehehehe";
-
-    $data_to_hash = $userEmail . $timeStamp . $tompero;
-
-    $token = hash('sha256', $data_to_hash);
-
-    return $token;
+        
+      return $this->insert($generatedToken, $expirationTime, $user->getId());
   }
 
   private function tokenExists($userId): bool
   {
-    $token = $this->repository->findByUser($userId);
+    $token = $this->tokenRepository->findByUser($userId);
 
     if (!$token) {
       return false;
@@ -107,21 +71,14 @@ class TokenService
     }
   }
 
-  public function tokenIsValid(string $token): bool
+  public function tokenIsValid(?Token $token): bool
   {
-
-    if ($token == null) {
-      throw new APIException("Token Invalido!", 400);
+    if (!$token) {
+      throw new APIException("Token Invalido, necessário autenticação", 400);
     }
 
-    $searchToken = $this->repository->findByToken($token);
-
-    if (!$searchToken) {
-      throw new APIException("Token Invalido, necessário autenticação", 400);
-    } else {
-      if ($searchToken->getExpiredAt() < time()) {
-        throw new APIException("Token Expirado, necessário autenticação", 400);
-      }
+    if ($token->getExpiredAt() < time()) {
+      throw new APIException("Token Expirado, necessário autenticação", 400);
     }
 
     return true;
@@ -129,10 +86,24 @@ class TokenService
 
   public function getUserByValidToken(string $token): User
   {
-    $this->tokenIsValid($token);
+    $userToken = $this->tokenRepository->findByToken($token);
+    $this->tokenIsValid($userToken);
 
-    $tokenData = $this->repository->findByToken($token);
     $userService = new UserService();
-    return $userService->getUserById($tokenData->getIdUser());
+    return $userService->getUserById($userToken->getIdUser());
+  }
+
+  public function deleteTokenByUser(User $user): bool
+  { 
+    return $this->tokenRepository->deleteByUserId($user->getId());
+  }
+
+  private function generateToken(string $email): string
+  {
+    $timeStamp = time();
+    $tompero = "hehehehe";
+
+    $data_to_hash = $email . $timeStamp . $tompero;
+    return hash('sha256', $data_to_hash);
   }
 }
