@@ -116,4 +116,22 @@ class LivroRepository
 
     return $livro;
   }
+
+  public function update(Livro $livro): Livro
+  {
+    $sql = "
+            UPDATE livros
+            SET isAlocated = :isAlocated,
+                n_alocated  = :nAlocated
+            WHERE id = :id
+        ";
+
+    $stmt = $this->connection->prepare($sql);
+    $stmt->bindValue(':isAlocated', $livro->getIsAlocated(), PDO::PARAM_INT);
+    $stmt->bindValue(':nAlocated',  $livro->getNumeroLocacoes(), PDO::PARAM_INT);
+    $stmt->bindValue(':id', $livro->getId(), PDO::PARAM_INT);
+
+    $stmt->execute();
+    return $livro;
+  }
 }
