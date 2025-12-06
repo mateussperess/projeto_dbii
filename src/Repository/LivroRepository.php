@@ -154,4 +154,12 @@ class LivroRepository
     $stmt->execute();
     return $livro;
   }
+
+  public function findByCategoriaId(int $categoriaId): array
+  {
+    $stmt = $this->connection->prepare("SELECT * FROM livros WHERE id_genero = :id_genero");
+    $stmt->bindValue(":id_genero", $categoriaId);
+    $stmt->execute();
+    return $stmt->fetchAll() ?? [];
+  }
 }

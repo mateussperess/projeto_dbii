@@ -97,4 +97,11 @@ class CategoriaRepository
         $row["descricao"]
       ) : null;
   }
+
+  public function delete(int $id)
+  {
+    $stmt = $this->connection->prepare("DELETE FROM categorias WHERE id = :id");
+    $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+    $stmt->execute();
+  }
 }
