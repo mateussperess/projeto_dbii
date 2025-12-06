@@ -44,7 +44,7 @@ class EmprestimoService
         $livro->setIsAlocated(1);
         $livro->setNumeroLocacoes($livro->getNumeroLocacoes() + 1);
 
-        $this->livroService->update($livro);
+        $this->livroService->updateIsAlocatedAndNAlocated($livro);
         return $emprestimo;
     }
 }

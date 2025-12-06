@@ -39,6 +39,26 @@ class LivroRepository
     }
   }
 
+  public function update(Livro $livro): Livro
+  {
+    try {
+      $stmt = $this->connection->prepare("UPDATE livros SET titulo = :titulo, autor = :autor, descricao = :descricao, ano = :ano, n_paginas = :n_paginas, id_genero = :id_genero WHERE id = :id");
+      $stmt->bindValue(":id", $livro->getId(), PDO::PARAM_INT);
+      $stmt->bindValue(":titulo", $livro->getTitulo(), PDO::PARAM_STR);
+      $stmt->bindValue(":autor", $livro->getAutor(), PDO::PARAM_STR);
+      $stmt->bindValue(":descricao", $livro->getDescricao(), PDO::PARAM_STR);
+      $stmt->bindValue(":ano", $livro->getAno(), PDO::PARAM_INT);
+      $stmt->bindValue(":n_paginas", $livro->getNumeroPaginas(), PDO::PARAM_INT);
+      $stmt->bindValue(":id_genero", $livro->getIdGenero(), PDO::PARAM_INT);
+
+      $stmt->execute();
+
+      return $livro;
+    } catch (PDOException $e) {
+      throw new PDOException("Erro ao atualizar livro no banco de dados: " . $e->getMessage(), 500);
+    }
+  }
+
   public function findAll(): array|bool
   {
     $stmt = $this->connection->prepare("SELECT id, titulo, autor, descricao, ano, n_paginas, isAlocated, n_alocated, id_genero FROM livros");
@@ -117,7 +137,7 @@ class LivroRepository
     return $livro;
   }
 
-  public function update(Livro $livro): Livro
+  public function updateIsAlocatedAndNAlocated(Livro $livro): Livro
   {
     $sql = "
             UPDATE livros

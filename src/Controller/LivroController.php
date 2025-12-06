@@ -27,7 +27,17 @@ class LivroController
           $response = $this->service->getLivroById($id);
           Response::send($response);
           break;
-        
+        case 'PUT':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
+          $data = $this->validateBody($request->getBody(), $method);
+          $response = $this->service->update($id, $data);
+
+          Response::send($response);
+          break;
         default:
           # code...
           break;
@@ -42,7 +52,7 @@ class LivroController
 
         case 'POST':
           $authenticatedUser = $request->getAuthenticatedUser();
-          if(!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
             throw new APIException("Acesso negado!", 403);
           }
 
@@ -61,7 +71,7 @@ class LivroController
   {
     $livro = [];
 
-    if ($method == "POST") {
+    if ($method === "POST" || $method === "PUT") {
       if (!isset($body["titulo"])) {
         throw new APIException("Campo titulo é obrigatório!", 400);
       }

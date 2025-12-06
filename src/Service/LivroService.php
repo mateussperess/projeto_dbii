@@ -59,12 +59,31 @@ class LivroService
     return $livro;
   }
 
-  public function update(Livro $livro): Livro
+  public function update(int $id, array $data): Livro
+  {
+    $livro = $this->repository->findLivroById($id);
+    if (!$livro) {
+      throw new APIException("Livro inexistente!");
+    }
+
+    $livro->setTitulo($data['titulo']);
+    $livro->setAutor($data['autor']);
+    $livro->setDescricao($data['descricao']);
+    $livro->setAno($data['ano']);
+    $livro->setNumeroPaginas($data['n_paginas']);
+    $livro->setIdGenero($data['id_genero']);
+
+    $this->validateLivro($livro);
+
+    return $this->repository->update($livro);
+  }
+
+  public function updateIsAlocatedAndNAlocated(Livro $livro): Livro
     {
-        if ($livro->getId() === null) {
-            throw new APIException("Livro inválido.", 400);
-        }
-        return $this->repository->update($livro);
+      if ($livro->getId() === null) {
+          throw new APIException("Livro inválido.", 400);
+      }
+      return $this->repository->updateIsAlocatedAndNAlocated($livro);
     }
   
   private function validateLivro(Livro $livro) {
