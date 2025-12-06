@@ -24,29 +24,38 @@ class UserController
     if ($id !== null) { // rotas que possuem um id
       switch ($method) {
         case 'GET':
-          $user = $request->getAuthenticatedUser();
-          $response = $this->service->getUserByIdAuthorized($user, $id);
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if ((!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) && $authenticatedUser->getId() != $id) {
+            throw new APIException("Acesso negado!", 403);
+          }
+          $response = $this->service->findUserById($id);
 
           Response::send($response);
           break;
 
         case 'PUT':
           $authenticatedUser = $request->getAuthenticatedUser();
+          if ((!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) && $authenticatedUser->getId() != $id) {
+            throw new APIException("Acesso negado!", 403);
+          }
           $data = $this->validateBody($request->getBody(), "PUT");
-          $response = $this->service->updateUserAuthorized($authenticatedUser, $id, $data);
-          
+          $response = $this->service->updateUserAuthorized($id, $data['nome'], $data['telefone']);
+
           Response::send($response);
           break;
 
         case 'PATCH':
-            $authenticatedUser = $request->getAuthenticatedUser();
-            $data = $this->validateBody($request->getBody(), "PATCH");
-            $response = $this->service->updateAdminStatus($authenticatedUser, $id, $data['isAdmin']);
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if ((!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) && $authenticatedUser->getId() != $id) {
+            throw new APIException("Acesso negado!", 403);
+          }
+          $data = $this->validateBody($request->getBody(), "PATCH");
+          $response = $this->service->updateAdminStatus($id, $data['isAdmin']);
 
-            Response::send($response);
-            break;
+          Response::send($response);
+          break;
         default:
-          # code...
+          throw new APIException("Method not allowed", 405);
           break;
       }
     } else { // rotas que nao possuem um id
@@ -71,7 +80,8 @@ class UserController
           break;
 
         default:
-          throw new APIException("Method not allowed!", 405);
+          throw new APIException("Method not allowed", 405);
+          break;
       }
     }
   }

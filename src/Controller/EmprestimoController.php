@@ -31,8 +31,9 @@ class EmprestimoController
                     $emprestimo = $this->emprestimoService->criarEmprestimo($user->getId(), $data['id_livro']);
                     Response::send($emprestimo);
                     break;
+                    
                 default:
-                    // Method not allowed...
+                    throw new APIException("Method not allowed", 405);
                     break;
             }
         }

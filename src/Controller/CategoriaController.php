@@ -18,7 +18,6 @@ class CategoriaController
 
   public function proccessRequest(Request $request)
   {
-
     $id = $request->getId();
     $method = $request->getMethod();
 
@@ -34,6 +33,7 @@ class CategoriaController
           $response = $this->service->update($id, ...$categoria);
           Response::send($response, 200);
           break;
+          
         case 'DELETE':
           $authenticatedUser = $request->getAuthenticatedUser();
           if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
@@ -43,9 +43,12 @@ class CategoriaController
           $this->service->delete($id);
           Response::send(["status" => "success"], 200);
           break;
+
+        default:
+          throw new APIException("Method not allowed", 405);
+          break;
       }
     } else {
-
       switch ($method) {
         case 'GET':
           $descricao = $request->getQuery()["descricao"] ?? null;
@@ -65,7 +68,7 @@ class CategoriaController
           break;
 
         default:
-          # code...
+          throw new APIException("Method not allowed", 405);
           break;
       }
     }
