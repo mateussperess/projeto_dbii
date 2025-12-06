@@ -5,28 +5,31 @@ namespace Service;
 use Error\APIException;
 use Exception;
 use Model\Livro;
+use Repository\CategoriaRepository;
 use Repository\LivroRepository;
 
 class LivroService
 {
   private LivroRepository $repository;
+  private CategoriaRepository $categoriaRepository;
 
   public function __construct()
   {
     $this->repository = new LivroRepository();
+    $this->categoriaRepository = new CategoriaRepository();
   }
 
-  public function insert(string $titulo, string $autor, string $descricao, int $ano, int $n_paginas, int $id_genero): Livro {
+  public function insert(array $data): Livro {
     $livro = new Livro(
       null,
-      $titulo,
-      $autor,
-      $descricao,
-      $ano,
-      $n_paginas,
+      $data['titulo'],
+      $data['autor'],
+      $data['descricao'],
+      $data['ano'],
+      $data['n_paginas'],
       0,
       0,
-      $id_genero
+      $data['id_genero']
     );
 
     $this->validateLivro($livro);
@@ -73,10 +76,13 @@ class LivroService
       throw new APIException("O ano de publicação do livro é inválido!", 400);
     }
 
-    if($livro->getNumeroPaginas() < 0) {
+    if($livro->getNumeroPaginas() <= 0) {
       throw new APIException("Quantidade de páginas inválidas!", 400);
     }
 
-    // TODO: verificar se o gênero informado existe...
+    $categoria = $this->categoriaRepository->findById($livro->getIdGenero());
+    if (!$categoria) {
+      throw new APIException("Categoria inexistente!", 404);
+    }
   }
 }
