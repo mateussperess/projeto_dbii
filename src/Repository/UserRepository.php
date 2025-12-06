@@ -126,14 +126,20 @@ class UserRepository
     return $user;
   }
 
-  public function update(User $user): void {
-    $stmt = $this->connection->prepare("UPDATE users SET nome = :nome, email = :email, senha = :senha, telefone = :telefone, isAdmin = :isAdmin WHERE id = :id");
+  public function update(User $user): void
+  {
+    $stmt = $this->connection->prepare("UPDATE users SET nome = :nome, telefone = :telefone WHERE id = :id");
     $stmt->bindValue(":id", $user->getId(), PDO::PARAM_INT);
     $stmt->bindValue(":nome", $user->getNome(), PDO::PARAM_STR);
-    $stmt->bindValue(":email", $user->getEmail(), PDO::PARAM_STR);
-    $stmt->bindValue(":senha", $user->getSenha(), PDO::PARAM_STR);
     $stmt->bindValue(":telefone", $user->getTelefone(), PDO::PARAM_STR);
+    $stmt->execute();
+  }
+
+  public function updateAdminStatus(User $user): void
+  {
+    $stmt = $this->connection->prepare("UPDATE users SET isAdmin = :isAdmin WHERE id = :id");
     $stmt->bindValue(":isAdmin", $user->getIsAdmin(), PDO::PARAM_INT);
+    $stmt->bindValue(":id", $user->getId(), PDO::PARAM_INT);
     $stmt->execute();
   }
 }

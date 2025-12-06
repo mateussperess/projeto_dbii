@@ -22,17 +22,17 @@ $body = file_get_contents("php://input");
 $request = new Request($uri, $method, $body);
 
 switch ($request->getResource()) {
-  case 'user':
+  case 'users':
     $userController = new UserController();
     $userController->proccessRequest($request);
     break;
 
-  case "categoria":
+  case "categorias":
     $categoriasController = new CategoriaController();
     $categoriasController->proccessRequest($request);
     break;
 
-  case "livro":
+  case "livros":
     $livroController = new LivroController();
     $livroController->proccessRequest($request);
     break;
@@ -42,7 +42,7 @@ switch ($request->getResource()) {
     $authController->proccessRequest($request);
     break;
   
-  case "emprestimo":
+  case "emprestimos":
     $emprestimoController = new EmprestimoController();
     $emprestimoController->processRequest($request);
     break;
