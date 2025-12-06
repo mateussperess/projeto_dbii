@@ -2,9 +2,9 @@
 
 use Controller\AuthController;
 use Controller\CategoriaController;
+use Controller\EmprestimoController;
 use Controller\LivroController;
 use Controller\UserController;
-use Controller\TokenController;
 use Error\APIException;
 use Http\Request;
 use Http\Response;
@@ -43,6 +43,8 @@ switch ($request->getResource()) {
     break;
   
   case "emprestimo":
+    $emprestimoController = new EmprestimoController();
+    $emprestimoController->processRequest($request);
     break;
 
   case null:

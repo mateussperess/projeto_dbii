@@ -3,6 +3,7 @@
 namespace Service;
 
 use Error\APIException;
+use Exception;
 use Model\Livro;
 use Repository\LivroRepository;
 
@@ -48,8 +49,20 @@ class LivroService
 
     $livro = $this->repository->findLivroById($id);
 
+    if (!$livro) {
+      throw new APIException("Livro inexistente!", 400);
+    }
+
     return $livro;
   }
+
+  public function update(Livro $livro): Livro
+    {
+        if ($livro->getId() === null) {
+            throw new APIException("Livro inválido.", 400);
+        }
+        return $this->repository->update($livro);
+    }
   
   private function validateLivro(Livro $livro) {
     if(strlen($livro->getTitulo()) < 5) {
