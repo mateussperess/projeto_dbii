@@ -33,7 +33,7 @@ class EmprestimoRepository
     public function findOpenLoansByUser(int $idUser): array
     {
         $stmt = $this->connection->prepare(
-            "SELECT * FROM emprestimos WHERE idUser = :idUser AND data_entrega IS NULL AND datetime('now') > datetime(data_inicio, '+7 days');"
+            "SELECT * FROM emprestimos WHERE idUser = :idUser AND data_entrega IS NULL AND datetime('now') > datetime(data_inicio, '+14 days');"
         );
         $stmt->bindValue(":idUser", $idUser);
         $stmt->execute();
