@@ -47,7 +47,7 @@ class UserService
     return $this->repository->findByEmail($email);
   }
 
-  public function insert(string $nome, string $email, string $senha, string $telefone, int $isAdmin): User
+  public function insert(string $nome, string $email, string $senha, string $telefone): User
   {
     $user = new User(
       null,
@@ -55,7 +55,7 @@ class UserService
       $email,
       $senha,
       $telefone,
-      $isAdmin
+      0
     );
 
     $this->validateUser($user);
@@ -97,7 +97,7 @@ class UserService
     $userEmailAlreadyExists = $this->repository->findByEmail($user->getEmail());
     if ($userEmailAlreadyExists) {
       if ($userEmailAlreadyExists->getId() !== $user->getId()) {
-        throw new APIException("Este email já está em uso!", 409);
+        throw new APIException("Este email já está em uso!", 404);
       }
     }
   }

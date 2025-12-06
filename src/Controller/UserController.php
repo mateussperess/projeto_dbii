@@ -100,12 +100,6 @@ class UserController
         throw new APIException("Campo telefone é obrigatório!", 400);
       }
       $user["telefone"] = $body["telefone"];
-
-      if (!isset($body["isAdmin"])) {
-        throw new APIException("Campo isAdmin é obrigatório!", 400);
-      }
-      $user["isAdmin"] = $body["isAdmin"];
-    
     } else if ($method === "PUT") {
       if (!isset($body["nome"])) {
         throw new APIException("Campo nome é obrigatório!", 400);
