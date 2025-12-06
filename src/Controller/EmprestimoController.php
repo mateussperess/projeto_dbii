@@ -6,6 +6,7 @@ use Error\APIException;
 use Http\Request;
 use Http\Response;
 use Service\EmprestimoService;
+use Service\LivroService;
 
 class EmprestimoController
 {
@@ -13,7 +14,7 @@ class EmprestimoController
 
     public function __construct()
     {
-        $this->emprestimoService = new EmprestimoService();
+        $this->emprestimoService = new EmprestimoService(new LivroService());
     }
 
     public function processRequest(Request $request)

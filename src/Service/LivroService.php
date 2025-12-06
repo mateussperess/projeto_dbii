@@ -3,7 +3,6 @@
 namespace Service;
 
 use Error\APIException;
-use Exception;
 use Model\Livro;
 use Repository\CategoriaRepository;
 use Repository\LivroRepository;
@@ -12,11 +11,13 @@ class LivroService
 {
   private LivroRepository $repository;
   private CategoriaRepository $categoriaRepository;
+  private EmprestimoService $emprestimoService;
 
   public function __construct()
   {
     $this->repository = new LivroRepository();
     $this->categoriaRepository = new CategoriaRepository();
+    $this->emprestimoService = new EmprestimoService($this);
   }
 
   public function insert(array $data): Livro
@@ -92,6 +93,21 @@ class LivroService
   public function findByCategoriaId(int $categoriaId): array
   {
     return $this->repository->findByCategoriaId($categoriaId);
+  }
+
+  public function delete(int $id)
+  {
+    $livro = $this->repository->findLivroById($id);
+    if (!$livro) {
+      throw new APIException("Livro não encontrado!", 404);
+    }
+
+    $emprestimos = $this->emprestimoService->findEmprestimosAtivosPorLivro($id);
+    if (count($emprestimos) > 0) {
+      throw new APIException("Livro não pode ser deletado. Possui empréstimos ativos!", 400);
+    }
+
+    $this->repository->delete($id);
   }
 
   private function validateLivro(Livro $livro)

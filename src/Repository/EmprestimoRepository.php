@@ -60,4 +60,13 @@ class EmprestimoRepository
             $data["data_entrega"]
         ) : null;
     }
+
+    public function findEmprestimosAtivosPorLivroId(int $livroId): array
+    {
+        $stmt = $this->connection->prepare("SELECT * FROM emprestimos WHERE idLivro = :idLivro AND data_entrega IS NULL");
+        $stmt->bindValue(":idLivro", $livroId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll() ?? [];
+    }
 }

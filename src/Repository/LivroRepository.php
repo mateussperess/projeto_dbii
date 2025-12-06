@@ -162,4 +162,11 @@ class LivroRepository
     $stmt->execute();
     return $stmt->fetchAll() ?? [];
   }
+
+  public function delete(int $id): void
+  {
+    $stmt = $this->connection->prepare("DELETE FROM livros where id = :id");
+    $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+    $stmt->execute();
+  }
 }

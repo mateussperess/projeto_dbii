@@ -11,10 +11,10 @@ class EmprestimoService
     private EmprestimoRepository $emprestimoRepository;
     private LivroService $livroService;
 
-    public function __construct()
+    public function __construct(LivroService $livroService)
     {
         $this->emprestimoRepository = new EmprestimoRepository();
-        $this->livroService = new LivroService();
+        $this->livroService = $livroService;
     }
 
     public function criarEmprestimo(int $idUser, int $idLivro): Emprestimo
@@ -46,5 +46,10 @@ class EmprestimoService
 
         $this->livroService->updateIsAlocatedAndNAlocated($livro);
         return $emprestimo;
+    }
+
+    public function findEmprestimosAtivosPorLivro(int $livroId): array
+    {
+        return $this->emprestimoRepository->findEmprestimosAtivosPorLivroId($livroId);
     }
 }
