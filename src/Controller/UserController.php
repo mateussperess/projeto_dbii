@@ -18,45 +18,33 @@ class UserController
 
   public function proccessRequest(Request $request)
   {
-
     $id = $request->getId();
     $method = $request->getMethod();
 
     if ($id !== null) { // rotas que possuem um id
       switch ($method) {
         case 'GET':
-          $response = $this->service->getUserById($id);
           $user = $request->getAuthenticatedUser();
-
-          if ($user->getId() != $id && $user->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado!", 403);
-          }
+          $response = $this->service->getUserByIdAuthorized($user, $id);
 
           Response::send($response);
           break;
 
         case 'PUT':
           $authenticatedUser = $request->getAuthenticatedUser();
+          $data = $this->validateBody($request->getBody(), "PUT");
+          $response = $this->service->updateUserAuthorized($authenticatedUser, $id, $data);
           
-          if ($authenticatedUser->getId() != $id && $authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado!", 403);
-          }
-
-          $user = $this->validateBody($request->getBody(), $method);
-          $user["id"] = $id;
-          
-          $currentUser = $this->service->getUserById($id);
-          
-          if (!isset($user["isAdmin"])) {
-            $user["isAdmin"] = $currentUser->getIsAdmin();
-          } else if ($authenticatedUser->getIsAdmin() != 1) {
-            throw new APIException("Acesso negado para alterar o campo isAdmin!", 403);
-          }
-          
-          $response = $this->service->updateUser(...$user);
           Response::send($response);
           break;
 
+        case 'PATCH':
+            $authenticatedUser = $request->getAuthenticatedUser();
+            $data = $this->validateBody($request->getBody(), "PATCH");
+            $response = $this->service->updateAdminStatus($authenticatedUser, $id, $data['isAdmin']);
+
+            Response::send($response);
+            break;
         default:
           # code...
           break;
@@ -112,36 +100,26 @@ class UserController
         throw new APIException("Campo telefone é obrigatório!", 400);
       }
       $user["telefone"] = $body["telefone"];
-
-      if (!isset($body["isAdmin"])) {
-        throw new APIException("Campo isAdmin é obrigatório!", 400);
-      }
-      $user["isAdmin"] = $body["isAdmin"];
-    
     } else if ($method === "PUT") {
       if (!isset($body["nome"])) {
         throw new APIException("Campo nome é obrigatório!", 400);
       }
       $user["nome"] = $body["nome"];
 
-      if (!isset($body["email"])) {
-        throw new APIException("Campo email é obrigatório!", 400);
-      }
-      $user["email"] = $body["email"];
-
-      if (!isset($body["senha"])) {
-        throw new APIException("Campo senha é obrigatório!", 400);
-      }
-      $user["senha"] = $body["senha"];
-
       if (!isset($body["telefone"])) {
         throw new APIException("Campo telefone é obrigatório!", 400);
       }
       $user["telefone"] = $body["telefone"];
-
-      if (isset($body["isAdmin"])) {
-        $user["isAdmin"] = $body["isAdmin"];
+    } else if ($method === "PATCH") {
+      if (!isset($body["isAdmin"])) {
+        throw new APIException("Campo isAdmin é obrigatório", 400);
       }
+
+      if ($body['isAdmin'] !== 0 && $body['isAdmin'] !== 1) {
+        throw new APIException("O campo 'isAdmin' deve ser 0 ou 1", 400);
+      }
+
+      $user['isAdmin'] = $body['isAdmin'];
     }
 
     return $user;

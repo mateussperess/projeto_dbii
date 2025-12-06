@@ -25,6 +25,15 @@ class UserService
     return $user;
   }
 
+  public function getUserByIdAuthorized(User $authUser, int $requestId): User
+  {
+    if (!$authUser->getIsAdmin() && $authUser->getId() !== $requestId) {
+      throw new APIException("Acesso negado!", 403);
+    }
+
+    return $this->repository->findUserById($requestId);
+  }
+
 
   public function getUserById(int $id): User
   {
@@ -38,7 +47,7 @@ class UserService
     return $this->repository->findByEmail($email);
   }
 
-  public function insert(string $nome, string $email, string $senha, string $telefone, int $isAdmin): User
+  public function insert(string $nome, string $email, string $senha, string $telefone): User
   {
     $user = new User(
       null,
@@ -46,7 +55,7 @@ class UserService
       $email,
       $senha,
       $telefone,
-      $isAdmin
+      0
     );
 
     $this->validateUser($user);
@@ -57,23 +66,24 @@ class UserService
   }
 
 
-  public function updateUser(int $id, string $nome, string $email, string $senha, string $telefone, ?int $isAdmin = null): User
+  public function updateUserAuthorized(User $user, int $requestId, array $body): User
   {
-    $user = $this->getUserById($id);
-
-    $user->setNome($nome);
-    $user->setEmail($email);
-    $user->setSenha($senha);
-    $user->setTelefone($telefone);
-
-    if ($isAdmin !== null) {
-      $user->setIsAdmin($isAdmin);
+    if (!$user->getIsAdmin() && $user->getId() !== $requestId) {
+      throw new APIException("Acesso negado", 403);
     }
 
-    $this->validateUser($user);
-    $this->repository->update($user);
+    $updateUser = $this->repository->findUserById($requestId);
 
-    return $user;
+    if (!$updateUser) {
+      throw new APIException("Usuário não encontrado!", 404);
+    }
+
+    $updateUser->setNome($body['nome']);
+    $updateUser->setTelefone($body['telefone']);
+
+    $this->repository->update($updateUser);
+
+    return $updateUser;
   }
 
   public function validateUser(User $user)
@@ -102,6 +112,22 @@ class UserService
     }
 
     return $this->getUsers($nome);
+  }
+
+  public function updateAdminStatus(User $user, int $requestId, int $is_admin): User
+  {
+    if (!$user->getIsAdmin()) {
+      throw new APIException("Acesso negado!", 403);
+    }
+
+    $updateUser = $this->repository->findUserById($requestId);
+    if (!$updateUser) {
+      throw new APIException("Usuário não encontrado!", 404);
+    }
+
+    $updateUser->setIsAdmin($is_admin);
+    $this->repository->updateAdminStatus($updateUser);
+    return $updateUser;
   }
 
   public function isAdmin(User $user): bool
