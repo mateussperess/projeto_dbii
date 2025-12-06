@@ -97,7 +97,7 @@ class UserService
     $userEmailAlreadyExists = $this->repository->findByEmail($user->getEmail());
     if ($userEmailAlreadyExists) {
       if ($userEmailAlreadyExists->getId() !== $user->getId()) {
-        throw new APIException("Este email já está em uso!", 404);
+        throw new APIException("Este email já está em uso!", 409);
       }
     }
   }
