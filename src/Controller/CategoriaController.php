@@ -23,6 +23,18 @@ class CategoriaController
     $method = $request->getMethod();
 
     if ($id !== null) {
+      switch ($method) {
+        case 'PUT':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
+          $categoria = $this->validateBody($request->getBody(), $method);
+          $response = $this->service->update($id, ...$categoria);
+          Response::send($response, 200);
+          break;
+      }
     } else {
 
       switch ($method) {
@@ -33,6 +45,11 @@ class CategoriaController
           break;
 
         case 'POST':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
           $categoria = $this->validateBody($request->getBody(), $method);
           $response = $this->service->insert(...$categoria);
           Response::send($response, 201);
@@ -49,7 +66,7 @@ class CategoriaController
   {
     $categoria = [];
 
-    if ($method !== "PATCH") {
+    if ($method === "POST" || $method === "PUT") {
       if (!isset($body["descricao"])) {
         throw new APIException("Campo descricao é obrigatório!", 400);
       }
