@@ -65,6 +65,11 @@ class UserService
     return $user;
   }
 
+  public function delete(int $userId)
+  {
+
+  }
+
 
   public function updateUserAuthorized(User $user, int $requestId, array $body): User
   {

@@ -27,8 +27,35 @@ class EmprestimoController
                 case "POST":
                     $user = $request->getAuthenticatedUser();
                     $data = $this->validateBody($request->getBody());
-                    $emprestimo = $this->emprestimoService->criarEmprestimo($user->getId(), $data['id_livro']);
+
+                    if($data["devolver"] == 1){
+                        $emprestimo = $this->emprestimoService->devolverEmprestimo($user->getId(), $data['id_livro']);
+                    }else{
+                        $emprestimo = $this->emprestimoService->criarEmprestimo($user->getId(), $data['id_livro']);
+                    }
+                    
                     Response::send($emprestimo);
+                    break;
+
+                case "GET":
+                    $userId = $request->getQuery()["user_id"] ?? null;
+                    $mode = $request->getQuery()["mode"] ?? null;
+
+                    $user = $request->getAuthenticatedUser();
+
+                    if($mode == "all" && $user->getIsAdmin() == 1){
+                        $emprestimos = $this->emprestimoService->getEmprestimos();
+                    }else{
+                        if ($user->getId() != $userId && $user->getIsAdmin() != 1) {
+                            throw new APIException("Acesso negado!", 403);
+                        }else{
+                            $emprestimos = $this->emprestimoService->getEmprestimos($userId);
+                        }
+                    }
+                    
+
+                    
+                    Response::send($emprestimos);
                     break;
                 default:
                     // Method not allowed...
@@ -39,12 +66,18 @@ class EmprestimoController
 
     private function validateBody(array $body): array
     {
+        $devolver = 0;
+        
         if (!isset($body['id_livro'])) {
             throw new APIException("O id do livro é obrigatório!", 400);
         }
+        if (isset($body['devolver']) && $body['devolver'] == 1) {
+            $devolver = 1;
+        }
 
         return [
-            "id_livro" => $body['id_livro']
+            "id_livro" => $body['id_livro'],
+            "devolver" => $devolver
         ];
     }
 }

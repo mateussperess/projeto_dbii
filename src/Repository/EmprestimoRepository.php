@@ -30,10 +30,32 @@ class EmprestimoRepository
         return $emprestimo;
     }
 
+    public function updateEntrega($emprestimoId)
+    {
+        $stmt = $this->connection->prepare("UPDATE emprestimos SET data_entrega = :data_entrega WHERE id = :id");
+        $stmt->bindValue(":id", $emprestimoId);
+        $stmt->bindValue(":data_entrega",date("Y-m-d H:i:s"));
+
+        $stmt->execute();
+
+    }
+
     public function findOpenLoansByUser(int $idUser): array
     {
         $stmt = $this->connection->prepare(
-            "SELECT * FROM emprestimos WHERE idUser = :idUser AND data_entrega IS NULL AND datetime('now') > datetime(data_inicio, '+14 days');"
+            "SELECT * FROM emprestimos WHERE idUser = :idUser  AND data_entrega IS NULL;"
+        );
+        $stmt->bindValue(":idUser", $idUser);
+        $stmt->execute();
+
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
+    }
+
+    public function findAllLoansByUser(int $idUser): array
+    {
+        $stmt = $this->connection->prepare(
+            "SELECT * FROM emprestimos WHERE idUser = :idUser;"
         );
         $stmt->bindValue(":idUser", $idUser);
         $stmt->execute();
@@ -59,5 +81,16 @@ class EmprestimoRepository
             $data["data_inicio"],
             $data["data_entrega"]
         ) : null;
+    }
+
+    public function findAllOpenLoans(): array
+    {
+        $stmt = $this->connection->prepare(
+            "SELECT * FROM emprestimos;"
+        );
+        $stmt->execute();
+
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $data;
     }
 }
