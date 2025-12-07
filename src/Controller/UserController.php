@@ -46,7 +46,7 @@ class UserController
 
         case 'PATCH':
           $authenticatedUser = $request->getAuthenticatedUser();
-          if ((!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) && $authenticatedUser->getId() != $id) {
+          if ((!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1)) {
             throw new APIException("Acesso negado!", 403);
           }
           $data = $this->validateBody($request->getBody(), "PATCH");
