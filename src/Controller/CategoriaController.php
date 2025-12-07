@@ -46,7 +46,6 @@ class CategoriaController
 
         default:
           throw new APIException("Method not allowed", 405);
-          break;
       }
     } else {
       switch ($method) {
@@ -69,7 +68,6 @@ class CategoriaController
 
         default:
           throw new APIException("Method not allowed", 405);
-          break;
       }
     }
   }

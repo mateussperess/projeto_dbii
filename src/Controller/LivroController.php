@@ -52,7 +52,6 @@ class LivroController
 
         default:
           throw new APIException("Method not allowed", 405);
-          break;
       }
     } else {
       switch ($method) {
@@ -75,7 +74,6 @@ class LivroController
 
         default:
           throw new APIException("Method not allowed", 405);
-          break;
       }
     }
   }

@@ -139,49 +139,45 @@
 * O script `setup.php` prepara o banco de dados e insere dados de exemplo.
 * Nos arquivos de teste podem existir exemplos de requisições para testar as rotas e regras de negócio.
 
-## Endpoint
+## Endpoints
 
 ### Autenticação
-* POST /auth/register
-* POST /auth/login
-* POST /auth/logout
+* POST /api/auth - Gerar token de autenticação (login)
+* DELETE /api/auth - Logout (invalidar token)
 
-### Usuário
-* GET /auth/me
-* GET /users/me
-* PUT /users/me
-* PATCH /users/me
-* GET /users/me/emprestimos
+### Usuários (Público/Próprio usuário)
+* POST /api/users - Criar novo usuário
+* GET /api/users/{id} - Buscar usuário específico (admin ou próprio usuário)
+* PUT /api/users/{id} - Atualizar dados do usuário (admin ou próprio usuário)
 
-### Usuário Admin
-* GET /users
-* GET /users/:id
-* PUT /users/:id
-* PATCH /users/:id
-* DELETE /users/:id
-* GET /users/:id/emprestimos
+### Usuários (Admin)
+* GET /api/users - Listar todos os usuários
+* PATCH /api/users/{id} - Atualizar status de administrador
 
-### Livros
-* GET /livros
-* GET /livros?categoria=id
-* GET /livros/:id
-* POST /livros
-* PUT /livros/:id
-* PATCH /livros/:id
-* DELETE /livros/:id
+### Categorias (Público)
+* GET /api/categorias - Listar todas as categorias
+* GET /api/categorias?descricao=terror - Filtrar categorias por descrição
 
-### Categorias
-* GET /categorias
-* POST /categorias
-* PUT /categorias/:id
-* DELETE /categorias/:id
+### Categorias (Admin)
+* POST /api/categorias - Criar nova categoria
+* PUT /api/categorias/{id} - Atualizar categoria
+* DELETE /api/categorias/{id} - Deletar categoria
 
-### Empréstimos
-* GET /emprestimos
-* GET /emprestimos/:id
-* POST /emprestimos
-* PATCH /emprestimos/:id
-* POST /emprestimos/:id/cancelar
+### Livros (Público)
+* GET /api/livros - Listar todos os livros
+* GET /api/livros?titulo=exemplo - Filtrar livros por título
+* GET /api/livros/{id} - Buscar livro específico
+
+### Livros (Admin)
+* POST /api/livros - Criar novo livro
+* PUT /api/livros/{id} - Atualizar livro
+* DELETE /api/livros/{id} - Deletar livro
+
+### Empréstimos (Autenticado)
+* GET /api/emprestimos?user_id=1 - Listar empréstimos do usuário
+* GET /api/emprestimos?mode=all - Listar todos os empréstimos (admin)
+* POST /api/emprestimos - Criar empréstimo (devolver=0 ou omitido)
+* POST /api/emprestimos - Devolver livro (devolver=1)
 
 ## TO-DO
 

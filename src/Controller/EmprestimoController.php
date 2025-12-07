@@ -60,7 +60,6 @@ class EmprestimoController
                     break;
                 default:
                     throw new APIException("Method not allowed", 405);
-                    break;
             }
         }
     }

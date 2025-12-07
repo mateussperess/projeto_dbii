@@ -56,7 +56,6 @@ class UserController
           break;
         default:
           throw new APIException("Method not allowed", 405);
-          break;
       }
     } else { // rotas que nao possuem um id
       switch ($method) {
@@ -81,7 +80,6 @@ class UserController
 
         default:
           throw new APIException("Method not allowed", 405);
-          break;
       }
     }
   }
