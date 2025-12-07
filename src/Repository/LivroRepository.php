@@ -154,4 +154,19 @@ class LivroRepository
     $stmt->execute();
     return $livro;
   }
+
+  public function findByCategoriaId(int $categoriaId): array
+  {
+    $stmt = $this->connection->prepare("SELECT * FROM livros WHERE id_genero = :id_genero");
+    $stmt->bindValue(":id_genero", $categoriaId);
+    $stmt->execute();
+    return $stmt->fetchAll() ?? [];
+  }
+
+  public function delete(int $id): void
+  {
+    $stmt = $this->connection->prepare("DELETE FROM livros where id = :id");
+    $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+    $stmt->execute();
+  }
 }

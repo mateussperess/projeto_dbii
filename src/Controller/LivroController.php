@@ -38,6 +38,15 @@ class LivroController
 
           Response::send($response);
           break;
+        case 'DELETE':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
+          $this->service->delete($id);
+          Response::send(["status" => "success"], 200);
+          break;
         default:
           # code...
           break;

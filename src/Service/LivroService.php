@@ -1,9 +1,8 @@
-<?php 
+<?php
 
 namespace Service;
 
 use Error\APIException;
-use Exception;
 use Model\Livro;
 use Repository\CategoriaRepository;
 use Repository\LivroRepository;
@@ -12,14 +11,17 @@ class LivroService
 {
   private LivroRepository $repository;
   private CategoriaRepository $categoriaRepository;
+  private EmprestimoService $emprestimoService;
 
   public function __construct()
   {
     $this->repository = new LivroRepository();
     $this->categoriaRepository = new CategoriaRepository();
+    $this->emprestimoService = new EmprestimoService($this);
   }
 
-  public function insert(array $data): Livro {
+  public function insert(array $data): Livro
+  {
     $livro = new Livro(
       null,
       $data['titulo'],
@@ -38,17 +40,19 @@ class LivroService
     return $livro;
   }
 
-  public function getLivros(?string $titulo) : array|Livro {
-    if(!$titulo) return $this->repository->findAll();
+  public function getLivros(?string $titulo): array|Livro
+  {
+    if (!$titulo) return $this->repository->findAll();
 
     $livro = $this->repository->findByTitulo($titulo);
 
-    if(!$livro) throw new APIException("Não existe um livro com o título informado!", 404);
+    if (!$livro) throw new APIException("Não existe um livro com o título informado!", 404);
     return $livro;
   }
 
-  public function getLivroById(int $id): array|Livro {
-    if(!$id) return $this->repository->findAll();
+  public function getLivroById(int $id): array|Livro
+  {
+    if (!$id) return $this->repository->findAll();
 
     $livro = $this->repository->findLivroById($id);
 
@@ -79,23 +83,44 @@ class LivroService
   }
 
   public function updateIsAlocatedAndNAlocated(Livro $livro): Livro
-    {
-      if ($livro->getId() === null) {
-          throw new APIException("Livro inválido.", 400);
-      }
-      return $this->repository->updateIsAlocatedAndNAlocated($livro);
+  {
+    if ($livro->getId() === null) {
+      throw new APIException("Livro inválido.", 400);
     }
-  
-  private function validateLivro(Livro $livro) {
-    if(strlen($livro->getTitulo()) < 5) {
+    return $this->repository->updateIsAlocatedAndNAlocated($livro);
+  }
+
+  public function findByCategoriaId(int $categoriaId): array
+  {
+    return $this->repository->findByCategoriaId($categoriaId);
+  }
+
+  public function delete(int $id)
+  {
+    $livro = $this->repository->findLivroById($id);
+    if (!$livro) {
+      throw new APIException("Livro não encontrado!", 404);
+    }
+
+    $emprestimos = $this->emprestimoService->findEmprestimosAtivosPorLivro($id);
+    if (count($emprestimos) > 0) {
+      throw new APIException("Livro não pode ser deletado. Possui empréstimos ativos!", 400);
+    }
+
+    $this->repository->delete($id);
+  }
+
+  private function validateLivro(Livro $livro)
+  {
+    if (strlen($livro->getTitulo()) < 5) {
       throw new APIException("O título do livro é muito curto!", 400);
     }
 
-    if($livro->getAno() > 2025) {
+    if ($livro->getAno() > 2025) {
       throw new APIException("O ano de publicação do livro é inválido!", 400);
     }
 
-    if($livro->getNumeroPaginas() <= 0) {
+    if ($livro->getNumeroPaginas() <= 0) {
       throw new APIException("Quantidade de páginas inválidas!", 400);
     }
 

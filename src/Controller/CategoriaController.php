@@ -34,6 +34,15 @@ class CategoriaController
           $response = $this->service->update($id, ...$categoria);
           Response::send($response, 200);
           break;
+        case 'DELETE':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
+          $this->service->delete($id);
+          Response::send(["status" => "success"], 200);
+          break;
       }
     } else {
 
