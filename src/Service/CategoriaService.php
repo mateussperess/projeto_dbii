@@ -3,7 +3,6 @@
 namespace Service;
 
 use Error\APIException;
-use Exception;
 use Model\Categoria;
 use Repository\CategoriaRepository;
 

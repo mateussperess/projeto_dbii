@@ -137,7 +137,7 @@ class LivroRepository
     return $livro;
   }
 
-  public function updateIsAlocatedAndNAlocated(Livro $livro): Livro
+  public function updateIsAlocatedAndNumeroAlocacoes(Livro $livro): Livro
   {
     $sql = "
             UPDATE livros
