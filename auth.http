@@ -1,0 +1,12 @@
+POST http://localhost:8000/api/auth
+Content-Type: application/json
+
+{
+  "email": "jeremiasteste@gmail.com",
+  "senha": "12345678"
+}
+
+###  
+DELETE http://localhost:8000/api/auth
+Authorization: Bearer 1f962d19307a050a8e4c766bea81e2434f82baa79426a9d18ace6b5d819a26a4
+Content-Type: application/json

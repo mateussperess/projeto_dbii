@@ -1,0 +1,43 @@
+# Qualquer usuário com token
+###
+POST http://localhost:8000/api/emprestimos
+Content-Type: application/json
+Authorization: Bearer 50455fc48623bc4ddfb1d060d69e60dfb9483b64d2468e2321e5c04e6f59141d  
+
+{
+    "id_livro": 43
+}
+
+# Qualquer usuário com token
+###
+POST http://localhost:8000/api/emprestimos
+Content-Type: application/json
+Authorization: Bearer 50455fc48623bc4ddfb1d060d69e60dfb9483b64d2468e2321e5c04e6f59141d  
+
+{
+    "id_livro": 43,
+}
+
+# Qualquer usuário com token
+###
+POST http://localhost:8000/api/emprestimos
+Content-Type: application/json
+Authorization: Bearer 50455fc48623bc4ddfb1d060d69e60dfb9483b64d2468e2321e5c04e6f59141d  
+
+{
+    "id_livro": 43,
+    "devolver": 1
+}
+
+# Somente token admin
+###
+GET http://localhost:8000/api/emprestimos?mode=all
+Content-Type: application/json
+Authorization: Bearer f6bee283c2054ad2ab36f40bb042c2a66d716608866f5978432ce141712f81be  
+
+# Se token de admin, pode ver de todo mundo
+# Se não, somente os emprestimos do user
+###
+GET http://localhost:8000/api/emprestimos?user_id=7
+Content-Type: application/json
+Authorization: Bearer f6bee283c2054ad2ab36f40bb042c2a66d716608866f5978432ce141712f81be  

@@ -1,0 +1,42 @@
+# Somente token de admin
+POST http://localhost:8000/api/livros
+Content-Type: application/json
+Authorization: Bearer 3c90ca740b508d89a4be31b610af75bb448c2dd8fec734d4e02a72e7dc66d793
+
+{
+    "titulo": "Teste2",
+    "autor": "Teste2",
+    "descricao": "Teste2",
+    "ano": 2020,
+    "n_paginas": 100,
+    "id_genero": 10
+}
+
+# Somente token de admin
+###
+PUT http://localhost:8000/api/livros/43
+Content-Type: application/json
+Authorization: Bearer 3c90ca740b508d89a4be31b610af75bb448c2dd8fec734d4e02a72e7dc66d793
+
+{
+    "titulo": "Teste3",
+    "autor": "Teste3",
+    "descricao": "Teste3",
+    "ano": 2020,
+    "n_paginas": 100,
+    "id_genero": 10
+}
+
+# Qualquer um
+###
+GET http://localhost:8000/api/livros
+
+# Qualquer um
+###
+GET http://localhost:8000/api/livros/10
+
+# Somente token de admin, e somente se não tiver emprestimo com este livro
+###
+DELETE http://localhost:8000/api/livros/10
+Content-Type: application/json
+Authorization: Bearer 0eb864cca5ea5dc9bffcda47cb54e67316630648e5fe1cb0ec580e8a967deaa0

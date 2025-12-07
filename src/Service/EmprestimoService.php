@@ -6,7 +6,6 @@ use Error\APIException;
 use Model\Emprestimo;
 use Repository\EmprestimoRepository;
 
-
 class EmprestimoService 
 {
     private EmprestimoRepository $emprestimoRepository;
@@ -16,7 +15,7 @@ class EmprestimoService
     public function __construct(LivroService $livroService)
     {
         $this->emprestimoRepository = new EmprestimoRepository();
-        $this->livroService = new LivroService( );
+        $this->livroService = $livroService;
         $this->userService = new UserService();
     }
 
@@ -64,7 +63,7 @@ class EmprestimoService
 
                 $this->livroService->updateIsAlocatedAndNumeroAlocacoes($livro);
 
-                throw new APIException("livro devolvido", 201);
+                throw new APIException("Livro Devolvido", 201);
             }else{
                 throw new APIException("Este livro não está emprestado!", 400);
             }

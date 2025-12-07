@@ -1,0 +1,43 @@
+POST http://localhost:8000/api/users
+Content-Type: application/json
+
+# Qualquer um, cadastro apenas como user normal, para tornar admin usar a rota PATCH
+{
+  "email": "teste4@gmail.com",
+  "senha": "12345678",
+  "nome": "teste",
+  "telefone": "987654321"
+}
+
+# Se token de admin, pode qualquer user, se não
+# Se token de user normal, apenas o id dele
+###
+PUT http://localhost:8000/api/users/8
+Authorization: Bearer ad388e0008f87a4b7d43c77d57443a7efefff2b95a3197afd7421305e4d71ef3
+Content-Type: application/json
+
+{
+    "nome": "teste1234",
+    "telefone": "987654312"
+}
+
+# Apenas token de admin
+###
+PATCH http://localhost:8000/api/users/8
+Authorization: Bearer ad388e0008f87a4b7d43c77d57443a7efefff2b95a3197afd7421305e4d71ef3
+Content-Type: application/json
+
+{
+  "isAdmin": 1
+}
+
+#Somente token de user admin válido
+###
+GET http://localhost:8000/api/users
+Authorization: Bearer 4d349a5b4ae726e97bb98edc69a479711a056db7777640cacecf7607bd904f17
+
+# Se o token for de um user admin, pode ver qualquer um, se não
+# Se o token for de usar normal, apenas o id dele é possível ver
+###
+GET http://localhost:8000/api/users/7
+Authorization: Bearer 3853c1b5916b26987e50bf125dd3170d653a5144e214835394cfdf6fe2013e29

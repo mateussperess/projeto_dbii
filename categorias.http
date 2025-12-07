@@ -1,0 +1,28 @@
+# Somente token de admin
+POST http://localhost:8000/api/categorias
+Content-Type: application/json
+Authorization: Bearer babb2b45bf5870e9b35434fd34dc6b1fbe6f3da8123781d471b6706ab1d13297
+
+{
+  "descricao": "TesteCategoria"
+}
+
+# Somente token de admin
+###
+PUT http://localhost:8000/api/categorias/10
+Content-Type: application/json
+Authorization: Bearer babb2b45bf5870e9b35434fd34dc6b1fbe6f3da8123781d471b6706ab1d13297
+
+{
+  "descricao": "TesteCategoria2"
+}
+
+# Qualquer um
+###
+GET http://localhost:8000/api/categorias
+
+# Somente token de admin, e somente se não tiver livro com esta categoria
+###
+DELETE http://localhost:8000/api/categorias/10
+Content-Type: application/json
+Authorization: Bearer 0eb864cca5ea5dc9bffcda47cb54e67316630648e5fe1cb0ec580e8a967deaa0

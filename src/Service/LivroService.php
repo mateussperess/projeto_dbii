@@ -103,6 +103,7 @@ class LivroService
     }
 
     $emprestimos = $this->emprestimoService->findEmprestimosAtivosPorLivro($id);
+
     if (count($emprestimos) > 0) {
       throw new APIException("Livro não pode ser deletado. Possui empréstimos ativos!", 400);
     }
