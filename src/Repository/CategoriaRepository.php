@@ -69,6 +69,21 @@ class CategoriaRepository
     }
   }
 
+  public function update(Categoria $categoria): Categoria
+  {
+    try {
+      $stmt = $this->connection->prepare("UPDATE categorias SET descricao = :descricao WHERE id = :id");
+      $stmt->bindValue(":id", $categoria->getId(), PDO::PARAM_INT);
+      $stmt->bindValue(":descricao", $categoria->getDescricao(), PDO::PARAM_STR);
+
+      $stmt->execute();
+
+      return $categoria;
+    } catch (PDOException $e) {
+      throw new PDOException("Erro ao atualizar categoria no banco de dados: " . $e->getMessage(), 500);
+    }
+  }
+
   public function findById(int $id): ?Categoria
   {
     $stmt = $this->connection->prepare("SELECT * FROM categorias WHERE id = :id");

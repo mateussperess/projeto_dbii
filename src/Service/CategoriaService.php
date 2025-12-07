@@ -38,6 +38,18 @@ class CategoriaService
     return $categoria;
   }
 
+  public function update(int $id, string $descricao): Categoria
+  {
+    $categoria = $this->repository->findById($id);
+    if (!$categoria) {
+      throw new APIException("Categoria inexistente!");
+    }
+
+    $categoria->setDescricao($descricao);
+    $this->validateCategoria($categoria);
+    return $this->repository->update($categoria);
+  }
+
   private function validateCategoria(Categoria $categoria) {
     if(strlen($categoria->getDescricao()) < 5) {
       throw new APIException("Nome de categoria muito curta!", 400);
