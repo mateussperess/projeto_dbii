@@ -6,6 +6,7 @@ use Error\APIException;
 use Http\Request;
 use Http\Response;
 use Service\EmprestimoService;
+use Service\LivroService;
 
 class EmprestimoController
 {
@@ -13,7 +14,7 @@ class EmprestimoController
 
     public function __construct()
     {
-        $this->emprestimoService = new EmprestimoService();
+        $this->emprestimoService = new EmprestimoService(new LivroService());
     }
 
     public function processRequest(Request $request)
@@ -36,7 +37,7 @@ class EmprestimoController
                     
                     Response::send($emprestimo);
                     break;
-
+                    
                 case "GET":
                     $userId = $request->getQuery()["user_id"] ?? null;
                     $mode = $request->getQuery()["mode"] ?? null;
@@ -58,7 +59,7 @@ class EmprestimoController
                     Response::send($emprestimos);
                     break;
                 default:
-                    // Method not allowed...
+                    throw new APIException("Method not allowed", 405);
                     break;
             }
         }

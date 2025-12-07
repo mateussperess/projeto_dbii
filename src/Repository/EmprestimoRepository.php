@@ -83,8 +83,7 @@ class EmprestimoRepository
         ) : null;
     }
 
-    public function findAllOpenLoans(): array
-    {
+function findAllOpenLoans(): array {
         $stmt = $this->connection->prepare(
             "SELECT * FROM emprestimos;"
         );
@@ -92,5 +91,13 @@ class EmprestimoRepository
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $data;
+    }
+    public function findEmprestimosAtivosPorLivroId(int $livroId): array
+    {
+        $stmt = $this->connection->prepare("SELECT * FROM emprestimos WHERE idLivro = :idLivro AND data_entrega IS NULL");
+        $stmt->bindValue(":idLivro", $livroId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll() ?? [];
     }
 }

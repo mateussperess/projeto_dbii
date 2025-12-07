@@ -13,7 +13,7 @@ class EmprestimoService
     private LivroService $livroService;
     private UserService $userService;
 
-    public function __construct()
+    public function __construct(LivroService $livroService)
     {
         $this->emprestimoRepository = new EmprestimoRepository();
         $this->livroService = new LivroService( );
@@ -47,7 +47,7 @@ class EmprestimoService
         $livro->setIsAlocated(1);
         $livro->setNumeroLocacoes($livro->getNumeroLocacoes() + 1);
 
-        $this->livroService->update($livro);
+        $this->livroService->updateIsAlocatedAndNumeroAlocacoes($livro);
         return $emprestimo;
     }
 
@@ -62,7 +62,7 @@ class EmprestimoService
                 $this->emprestimoRepository->updateEntrega($emprestimoAbertoLivro->getId());
                 $livro->setIsAlocated(0);
 
-                $this->livroService->update($livro);
+                $this->livroService->updateIsAlocatedAndNumeroAlocacoes($livro);
 
                 throw new APIException("livro devolvido", 201);
             }else{
@@ -100,5 +100,9 @@ class EmprestimoService
         }
         
         return $openLoan;
+    }
+    public function findEmprestimosAtivosPorLivro(int $livroId): array
+    {
+        return $this->emprestimoRepository->findEmprestimosAtivosPorLivroId($livroId);
     }
 }

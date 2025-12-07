@@ -27,7 +27,7 @@ class AuthController
                 
                 Response::send($token, 201);
                 break;
-            case "DELETE": 
+            case 'DELETE': 
                 $user = $request->getAuthenticatedUser();
                 $this->authService->logout($user);
 

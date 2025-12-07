@@ -9,11 +9,11 @@ use Service\LivroService;
 
 class LivroController
 {
-  private LivroService $service;
+  private LivroService $livroService;
 
   public function __construct()
   {
-    $this->service = new LivroService();
+    $this->livroService = new LivroService();
   }
 
   public function proccessRequest(Request $request)
@@ -24,33 +24,58 @@ class LivroController
     if ($id !== null) {
       switch ($method) {
         case 'GET':
-          $response = $this->service->getLivroById($id);
+          $response = $this->livroService->getLivroById($id);
           Response::send($response);
           break;
-        
+
+        case 'PUT':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() !== 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
+          $data = $this->validateBody($request->getBody(), $method);
+          $response = $this->livroService->update($id, $data);
+
+          Response::send($response);
+          break;
+
+        case 'DELETE':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() !== 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
+          $this->livroService->delete($id);
+          Response::send(["status" => "success"], 200);
+          break;
+
         default:
-          # code...
+          throw new APIException("Method not allowed", 405);
           break;
       }
     } else {
       switch ($method) {
         case 'GET':
           $tituloLivro = $request->getQuery()["titulo"] ?? null;
-          $response = $this->service->getLivros($tituloLivro);
+          $response = $this->livroService->getLivros($tituloLivro);
           Response::send($response);
           break;
 
         case 'POST':
           $authenticatedUser = $request->getAuthenticatedUser();
-          if(!$authenticatedUser || (int) $authenticatedUser->getIsAdmin() !== 1) {
-            throw new APIException("Acesso negado! Apenas administradores podem cadastrar livros!", 403);
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() !== 1) {
+            throw new APIException("Acesso negado!", 403);
           }
 
-          $livro = $this->validateBody($request->getBody(), $method);
+          $data = $this->validateBody($request->getBody(), $method);
+          $response = $this->livroService->insert($data);
+          Response::send($response);
           break;
 
         default:
-          throw new APIException("Em desenvolvimento...", 404);
+          throw new APIException("Method not allowed", 405);
+          break;
       }
     }
   }
@@ -59,7 +84,7 @@ class LivroController
   {
     $livro = [];
 
-    if ($method !== "PATCH") {
+    if ($method === "POST" || $method === "PUT") {
       if (!isset($body["titulo"])) {
         throw new APIException("Campo titulo é obrigatório!", 400);
       }

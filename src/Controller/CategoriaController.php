@@ -18,13 +18,37 @@ class CategoriaController
 
   public function proccessRequest(Request $request)
   {
-
     $id = $request->getId();
     $method = $request->getMethod();
 
     if ($id !== null) {
-    } else {
+      switch ($method) {
+        case 'PUT':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
 
+          $categoria = $this->validateBody($request->getBody(), $method);
+          $response = $this->service->update($id, ...$categoria);
+          Response::send($response, 200);
+          break;
+          
+        case 'DELETE':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
+          $this->service->delete($id);
+          Response::send(["status" => "success"], 200);
+          break;
+
+        default:
+          throw new APIException("Method not allowed", 405);
+          break;
+      }
+    } else {
       switch ($method) {
         case 'GET':
           $descricao = $request->getQuery()["descricao"] ?? null;
@@ -33,13 +57,18 @@ class CategoriaController
           break;
 
         case 'POST':
+          $authenticatedUser = $request->getAuthenticatedUser();
+          if (!$authenticatedUser || $authenticatedUser->getIsAdmin() != 1) {
+            throw new APIException("Acesso negado!", 403);
+          }
+
           $categoria = $this->validateBody($request->getBody(), $method);
           $response = $this->service->insert(...$categoria);
           Response::send($response, 201);
           break;
 
         default:
-          # code...
+          throw new APIException("Method not allowed", 405);
           break;
       }
     }
@@ -49,7 +78,7 @@ class CategoriaController
   {
     $categoria = [];
 
-    if ($method !== "PATCH") {
+    if ($method === "POST" || $method === "PUT") {
       if (!isset($body["descricao"])) {
         throw new APIException("Campo descricao é obrigatório!", 400);
       }

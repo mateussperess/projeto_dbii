@@ -25,12 +25,8 @@ class UserService
     return $user;
   }
 
-  public function getUserByIdAuthorized(User $authUser, int $requestId): User
+  public function findUserById(int $requestId): User
   {
-    if (!$authUser->getIsAdmin() && $authUser->getId() !== $requestId) {
-      throw new APIException("Acesso negado!", 403);
-    }
-
     return $this->repository->findUserById($requestId);
   }
 
@@ -71,20 +67,16 @@ class UserService
   }
 
 
-  public function updateUserAuthorized(User $user, int $requestId, array $body): User
+  public function updateUserAuthorized(int $requestId, string $nome, string $telefone): User
   {
-    if (!$user->getIsAdmin() && $user->getId() !== $requestId) {
-      throw new APIException("Acesso negado", 403);
-    }
-
     $updateUser = $this->repository->findUserById($requestId);
 
     if (!$updateUser) {
       throw new APIException("Usuário não encontrado!", 404);
     }
 
-    $updateUser->setNome($body['nome']);
-    $updateUser->setTelefone($body['telefone']);
+    $updateUser->setNome($nome);
+    $updateUser->setTelefone($telefone);
 
     $this->repository->update($updateUser);
 
@@ -119,12 +111,8 @@ class UserService
     return $this->getUsers($nome);
   }
 
-  public function updateAdminStatus(User $user, int $requestId, int $is_admin): User
+  public function updateAdminStatus(int $requestId, int $is_admin): User
   {
-    if (!$user->getIsAdmin()) {
-      throw new APIException("Acesso negado!", 403);
-    }
-
     $updateUser = $this->repository->findUserById($requestId);
     if (!$updateUser) {
       throw new APIException("Usuário não encontrado!", 404);
